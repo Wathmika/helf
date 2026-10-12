@@ -1,0 +1,61 @@
+# Supabase CLI settings for LOCAL development (`supabase start`).
+# The live project's settings are made in the Supabase dashboard; the
+# setup guide (docs/backend-setup.md) lists each one.
+# Any setting not listed here uses the CLI's default.
+
+project_id = "medi"
+
+[api]
+# "private" is deliberately NOT listed: nothing in it is reachable over the API.
+schemas = ["public", "graphql_public"]
+max_rows = 1000
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.rate_limit]
+# login codes sent per hour, for the whole project
+sms_sent = 30
+token_verifications = 30
+
+[auth.sms]
+enable_signup = true
+enable_confirmations = true
+
+# Fake numbers that always accept the code 123456 and never send an SMS.
+# Use these while building. Supabase stores numbers without the "+".
+[auth.sms.test_otp]
+94770000001 = "123456"
+94770000002 = "123456"
+94770000003 = "123456"
+
+# Our own SMS sender: the Python backend running on your computer
+# (uvicorn on port 8000). It runs in dry-run mode and only logs, unless
+# SMS_DRY_RUN=false in backend/.env. Test numbers above never reach it.
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:8000/hooks/send-sms"
+secrets = "env(SEND_SMS_HOOK_SECRETS)"
+
+[auth.email]
+enable_signup = false
+
+[storage]
+file_size_limit = "2MiB"
+
+# Declared here (not via SQL migration) on purpose: `supabase start` applies
+# your SQL migrations before the storage-api container has finished setting
+# up its own storage.buckets table, so "insert into storage.buckets ..." in
+# a migration fails with "relation storage.buckets does not exist". The CLI
+# creates buckets declared here itself, after storage-api is ready.
+[storage.buckets.person-photos]
+public = false
+file_size_limit = "2MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp"]

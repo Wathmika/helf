@@ -1,0 +1,8 @@
+# For your computer only: running locally and testing
+-r src/requirements.txt
+uvicorn==0.53.0
+pytest==9.1.1
+standardwebhooks==1.1.0
+boto3==1.43.111
+python-dotenv==1.2.3
+tzdata==2026.3

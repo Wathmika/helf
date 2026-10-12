@@ -1,0 +1,19 @@
+{
+  "name": "helf",
+  "version": "1.0.0",
+  "description": "Prototype.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "supabase": "^2.120.0"
+  }
+}

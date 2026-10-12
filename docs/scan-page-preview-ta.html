@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>அவசர மருத்துவத் தகவல்</title>
+<style nonce="preview">
+:root{--bg:#FAF7F2;--card:#FFFFFF;--text:#1F2937;--muted:#4B5563;--line:#E5E1DA;--primary:#0F766E;--critical:#C62828;--warning:#B45309;--success:#15803D}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:18px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Sinhala","Noto Sans Tamil","Noto Sans",sans-serif}
+main{max-width:560px;margin:0 auto;padding:12px 16px 32px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--critical);color:#fff;font-weight:700;padding:4px 10px;border-radius:6px;font-size:15px;letter-spacing:.02em}
+h1{font-size:20px;margin:4px 0 0;width:100%}
+nav{display:flex;gap:4px}
+nav a,.btn-small{min-height:48px;min-width:48px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:2px solid var(--primary);border-radius:10px;color:var(--primary);text-decoration:none;font-weight:600;background:#fff;font-size:16px}
+nav a[aria-current="true"]{background:var(--primary);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+.person{display:flex;gap:14px;align-items:center}
+.person img{width:96px;height:96px;border-radius:12px;object-fit:cover;flex:none}
+.name{font-size:26px;font-weight:700;line-height:1.2;margin:0}
+.age{color:var(--muted);margin:2px 0 0}
+h2{font-size:18px;margin:0 0 8px}
+ul{margin:0;padding:0;list-style:none}
+.alerts{border:3px solid var(--critical)}
+.alerts h2{color:var(--critical)}
+.alerts li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-weight:700}
+.alerts li:first-child{border-top:0}
+.alerts svg{flex:none;margin-top:3px}
+.note{display:block;font-weight:400;color:var(--muted)}
+.calls a{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;border-radius:12px;margin:10px 0;text-decoration:none;font-weight:700;font-size:19px;text-align:center;padding:8px 12px}
+.call-1990{background:var(--text);color:#fff}
+.call-contact{background:var(--primary);color:#fff}
+.banner{border:3px solid var(--warning);background:#FFF7ED}
+ol{margin:0;padding-left:22px}
+ol li{margin:4px 0}
+.list li{padding:6px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.sev{font-weight:700}
+.facts dt{font-weight:700;margin-top:8px}
+.facts dd{margin:0}
+.fresh{display:flex;gap:8px;align-items:center;font-weight:600}
+.fresh.ok{color:var(--success)}
+.fresh.old{color:var(--warning)}
+.share{width:100%;min-height:52px;border:2px solid var(--primary);background:#fff;color:var(--primary);font:inherit;font-weight:700;border-radius:12px;cursor:pointer}
+.status{margin:8px 0 0;font-weight:600}
+footer{color:var(--muted);font-size:15px;margin-top:20px}
+.message{font-size:20px;font-weight:600}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <span class="badge">
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>
+    அவசரம்
+  </span>
+  <nav aria-label="Language">
+<a href="/s/devonly_SunilPerera_0001?lang=si&amp;s=7" lang="si" aria-current="false">සිං</a><a href="/s/devonly_SunilPerera_0001?lang=ta&amp;s=7" lang="ta" aria-current="true">தமி</a><a href="/s/devonly_SunilPerera_0001?lang=en&amp;s=7" lang="en" aria-current="false">EN</a>  </nav>
+  <h1>அவசர மருத்துவத் தகவல்</h1>
+</header>
+
+
+  <section class="card person">
+    <div>
+      <p class="name">Sunil Perera</p>
+<p class="age">வயது 72</p>    </div>
+  </section>
+
+  <button class="btn-small" id="listen" type="button">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+    &nbsp;கேளுங்கள்
+  </button>
+  <p class="status" id="listen-note" hidden>இந்தத் தொலைபேசியில் இந்த மொழியில் வாசித்துக் காட்ட முடியாது.</p>
+
+
+  <section class="card alerts" aria-labelledby="alerts-h">
+    <h2 id="alerts-h">முக்கிய எச்சரிக்கைகள்</h2>
+    <ul>
+      <li>
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#C62828" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+        <span>இரத்தம் மெலிதாக்கும் மருந்து எடுக்கிறார்<span class="note">Warfarin</span></span>
+      </li>
+      <li>
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#C62828" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+        <span>நீரிழிவு – இன்சுலின் எடுக்கிறார்<span class="note">Insulin glargine at night</span></span>
+      </li>
+      <li>
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#C62828" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+        <span>கடுமையான ஒவ்வாமை<span class="note">Penicillin</span></span>
+      </li>
+    </ul>
+  </section>
+
+  <div class="calls">
+<a class="call-contact" href="tel:+971500000000"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>Kasun (மகன்) அழைக்கவும்</a><a class="call-contact" href="tel:+94770000000"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>Nadeesha (மகள்) அழைக்கவும்</a>    <a class="call-1990" href="tel:1990"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>1990 அம்புலன்ஸை அழைக்கவும்</a>
+  </div>
+
+  <section class="card">
+    <h2>முதலில் செய்ய வேண்டியவை</h2>
+    <ol><li>அம்புலன்ஸுக்கு 1990 ஐ அழைக்கவும்.</li><li>மோட்டார் சைக்கிள் தலைக்கவசம் அணிந்திருந்தால் அதை அகற்ற வேண்டாம்.</li><li>சுயநினைவு இல்லையென்றால் உணவோ நீரோ கொடுக்க வேண்டாம்.</li></ol>
+  </section>
+
+  <section class="card">
+    <h2>ஒவ்வாமைகள்</h2>
+    <ul class="list">
+      <li><strong>Penicillin</strong> – <span class="sev">கடுமையானது</span></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>நோய் நிலைமைகள்</h2>
+    <ul class="list"><li>Type 2 diabetes (2012 முதல்)</li><li>Atrial fibrillation (2019 முதல்)</li><li>High blood pressure</li></ul>
+  </section>
+
+
+  <section class="card">
+    <dl class="facts">
+<dt>தொடர்பாடல் தேவைகள்</dt><dd>Hard of hearing in left ear. Speak on his right side.</dd><dt>பேசும் மொழிகள்</dt><dd>சிங்களம்</dd><dt>இரத்த வகை (தகவலுக்கு மட்டும்)</dt><dd>O+</dd><dt>உறுப்பு தானம் செய்பவர்</dt>    </dl>
+  </section>
+
+  <section class="card">
+    <p class="fresh ok">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#15803D" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>      இன்று புதுப்பிக்கப்பட்டது
+    </p>
+    <button class="share" id="share" type="button">என் இருப்பிடத்தைக் குடும்பத்தினருக்கு அனுப்பு</button>
+    <p class="status" id="share-sent" hidden>இருப்பிடம் அனுப்பப்பட்டது. நன்றி.</p>
+    <p class="status" id="share-failed" hidden>இருப்பிடத்தை அனுப்ப முடியவில்லை.</p>
+  </section>
+
+  <script type="application/json" id="page-data">{"locationUrl": "/s/devonly_SunilPerera_0001/location", "scanId": 7, "speech": "\u0b85\u0bb5\u0b9a\u0bb0 \u0bae\u0bb0\u0bc1\u0ba4\u0bcd\u0ba4\u0bc1\u0bb5\u0ba4\u0bcd \u0ba4\u0b95\u0bb5\u0bb2\u0bcd. Sunil Perera. \u0b87\u0bb0\u0ba4\u0bcd\u0ba4\u0bae\u0bcd \u0bae\u0bc6\u0bb2\u0bbf\u0ba4\u0bbe\u0b95\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0bae\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bc1 \u0b8e\u0b9f\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bbe\u0bb0\u0bcd: Warfarin. \u0ba8\u0bc0\u0bb0\u0bbf\u0bb4\u0bbf\u0bb5\u0bc1 \u2013 \u0b87\u0ba9\u0bcd\u0b9a\u0bc1\u0bb2\u0bbf\u0ba9\u0bcd \u0b8e\u0b9f\u0bc1\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bbe\u0bb0\u0bcd: Insulin glargine at night. \u0b95\u0b9f\u0bc1\u0bae\u0bc8\u0baf\u0bbe\u0ba9 \u0b92\u0bb5\u0bcd\u0bb5\u0bbe\u0bae\u0bc8: Penicillin. \u0b92\u0bb5\u0bcd\u0bb5\u0bbe\u0bae\u0bc8\u0b95\u0bb3\u0bcd: Penicillin. \u0b85\u0bae\u0bcd\u0baa\u0bc1\u0bb2\u0ba9\u0bcd\u0bb8\u0bc1\u0b95\u0bcd\u0b95\u0bc1 1990 \u0b90 \u0b85\u0bb4\u0bc8\u0b95\u0bcd\u0b95\u0bb5\u0bc1\u0bae\u0bcd. \u0bae\u0bcb\u0b9f\u0bcd\u0b9f\u0bbe\u0bb0\u0bcd \u0b9a\u0bc8\u0b95\u0bcd\u0b95\u0bbf\u0bb3\u0bcd \u0ba4\u0bb2\u0bc8\u0b95\u0bcd\u0b95\u0bb5\u0b9a\u0bae\u0bcd \u0b85\u0ba3\u0bbf\u0ba8\u0bcd\u0ba4\u0bbf\u0bb0\u0bc1\u0ba8\u0bcd\u0ba4\u0bbe\u0bb2\u0bcd \u0b85\u0ba4\u0bc8 \u0b85\u0b95\u0bb1\u0bcd\u0bb1 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bbe\u0bae\u0bcd. \u0b9a\u0bc1\u0baf\u0ba8\u0bbf\u0ba9\u0bc8\u0bb5\u0bc1 \u0b87\u0bb2\u0bcd\u0bb2\u0bc8\u0baf\u0bc6\u0ba9\u0bcd\u0bb1\u0bbe\u0bb2\u0bcd \u0b89\u0ba3\u0bb5\u0bcb \u0ba8\u0bc0\u0bb0\u0bcb \u0b95\u0bca\u0b9f\u0bc1\u0b95\u0bcd\u0b95 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bbe\u0bae\u0bcd.", "speechLang": "ta-LK"}</script>
+  <script nonce="preview">
+  (function () {
+    var data = JSON.parse(document.getElementById("page-data").textContent);
+    function show(id) { document.getElementById(id).hidden = false; }
+
+    var listen = document.getElementById("listen");
+    listen.addEventListener("click", function () {
+      if (!("speechSynthesis" in window)) { show("listen-note"); return; }
+      var synth = window.speechSynthesis, done = false;
+      function speak() {
+        if (done) return; done = true;
+        var prefix = data.speechLang.slice(0, 2);
+        var voice = synth.getVoices().filter(function (v) {
+          return (v.lang || "").toLowerCase().replace("_", "-").indexOf(prefix) === 0;
+        })[0];
+        if (!voice && prefix !== "en") { show("listen-note"); return; }
+        synth.cancel();
+        var u = new SpeechSynthesisUtterance(data.speech);
+        u.lang = data.speechLang; u.rate = 0.9;
+        if (voice) u.voice = voice;
+        synth.speak(u);
+      }
+      if (synth.getVoices().length) { speak(); }
+      else { synth.onvoiceschanged = speak; setTimeout(speak, 800); }
+    });
+
+    var share = document.getElementById("share");
+    share.addEventListener("click", function () {
+      if (!navigator.geolocation) { show("share-failed"); return; }
+      share.disabled = true;
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        fetch(data.locationUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scan_id: data.scanId, lat: pos.coords.latitude,
+                                 lng: pos.coords.longitude, accuracy: Math.round(pos.coords.accuracy) })
+        }).then(function (r) { show(r.ok ? "share-sent" : "share-failed"); share.hidden = r.ok; share.disabled = false; })
+          .catch(function () { show("share-failed"); share.disabled = false; });
+      }, function () { show("share-failed"); share.disabled = false; },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+    });
+  })();
+  </script>
+
+<footer><p>இந்தத் தகவலை இவரோ இவரது குடும்பத்தினரோ உள்ளிட்டனர். இது மருத்துவ ஆலோசனை அல்ல. பயிற்சி பெற்ற மீட்புப் பணியாளர்கள் மற்றும் மருத்துவமனை ஊழியர்களின் அறிவுறுத்தல்களைப் பின்பற்றவும்.</p></footer>
+</main>
+</body>
+</html>

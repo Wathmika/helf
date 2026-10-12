@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: MediQR backend - FastAPI on AWS Lambda (Mumbai)
+
+# Deploy from the backend folder:
+#   sam build
+#   sam deploy --guided      (first time: answers are saved to samconfig.toml)
+# Secrets are passed as parameters marked NoEcho, so they are hidden in the
+# AWS console and logs. Lambda stores environment variables encrypted.
+
+Parameters:
+  SupabaseUrl:
+    Type: String
+    Description: https://<ref>.supabase.co
+  SupabaseSecretKey:
+    Type: String
+    NoEcho: true
+  AppName:
+    Type: String
+    Default: MediQR
+  AppOrigins:
+    Type: String
+    Default: ""
+    Description: Comma-separated web app addresses allowed to call /account/*
+  IpHashSalt:
+    Type: String
+    NoEcho: true
+  TrustedIpHeader:
+    Type: String
+    Default: ""
+    Description: Set to cloudfront-viewer-address once CloudFront is in front
+  SendSmsHookSecret:
+    Type: String
+    NoEcho: true
+  SmsDryRun:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+  AllowedSmsCountryCodes:
+    Type: String
+    Default: "94,971,966,974,965,968,973,44,61,39,1"
+  LkSmsProvider:
+    Type: String
+    Default: notifylk
+    AllowedValues: [notifylk, textlk]
+  NotifylkUserId:
+    Type: String
+    Default: ""
+  NotifylkApiKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+  NotifylkSenderId:
+    Type: String
+    Default: ""
+  TextlkApiToken:
+    Type: String
+    Default: ""
+    NoEcho: true
+  TextlkSenderId:
+    Type: String
+    Default: ""
+  TwilioAccountSid:
+    Type: String
+    Default: ""
+  TwilioAuthToken:
+    Type: String
+    Default: ""
+    NoEcho: true
+  TwilioMessagingServiceSid:
+    Type: String
+    Default: ""
+  TwilioFrom:
+    Type: String
+    Default: ""
+  NotifyFamilySecret:
+    Type: String
+    NoEcho: true
+  PurgeFilesSecret:
+    Type: String
+    NoEcho: true
+  EmailDryRun:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+  SesFromAddress:
+    Type: String
+    Default: alerts@example.lk
+    Description: Verified sender address in SES (Mumbai)
+  SesFromName:
+    Type: String
+    Default: MediQR Alerts
+
+Resources:
+  BackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/                    # only src/ is uploaded: no tests, no .env
+      Handler: app.main.handler
+      Runtime: python3.13
+      Architectures: [arm64]           # cheaper than x86
+      MemorySize: 1024                 # more memory = more CPU = faster cold starts
+      Timeout: 10
+      # Cold-start options (see docs/backend-setup.md, "Scan page speed"):
+      # AutoPublishAlias: live
+      # SnapStart:
+      #   ApplyOn: PublishedVersions
+      # ProvisionedConcurrencyConfig:
+      #   ProvisionedConcurrentExecutions: 1
+      Environment:
+        Variables:
+          SUPABASE_URL: !Ref SupabaseUrl
+          SUPABASE_SECRET_KEY: !Ref SupabaseSecretKey
+          APP_NAME: !Ref AppName
+          APP_ORIGINS: !Ref AppOrigins
+          IP_HASH_SALT: !Ref IpHashSalt
+          TRUSTED_IP_HEADER: !Ref TrustedIpHeader
+          SEND_SMS_HOOK_SECRET: !Ref SendSmsHookSecret
+          SMS_DRY_RUN: !Ref SmsDryRun
+          ALLOWED_SMS_COUNTRY_CODES: !Ref AllowedSmsCountryCodes
+          LK_SMS_PROVIDER: !Ref LkSmsProvider
+          NOTIFYLK_USER_ID: !Ref NotifylkUserId
+          NOTIFYLK_API_KEY: !Ref NotifylkApiKey
+          NOTIFYLK_SENDER_ID: !Ref NotifylkSenderId
+          TEXTLK_API_TOKEN: !Ref TextlkApiToken
+          TEXTLK_SENDER_ID: !Ref TextlkSenderId
+          TWILIO_ACCOUNT_SID: !Ref TwilioAccountSid
+          TWILIO_AUTH_TOKEN: !Ref TwilioAuthToken
+          TWILIO_MESSAGING_SERVICE_SID: !Ref TwilioMessagingServiceSid
+          TWILIO_FROM: !Ref TwilioFrom
+          NOTIFY_FAMILY_SECRET: !Ref NotifyFamilySecret
+          PURGE_FILES_SECRET: !Ref PurgeFilesSecret
+          EMAIL_DRY_RUN: !Ref EmailDryRun
+          SES_REGION: !Ref AWS::Region
+          SES_FROM: !Sub "${SesFromName} <${SesFromAddress}>"
+      # The function may send email only, and only from your alerts address.
+      # No access keys needed: Lambda uses this permission directly.
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: "*"
+              Condition:
+                StringEquals:
+                  ses:FromAddress: !Ref SesFromAddress
+      Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: ANY
+        All:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+  # Keep logs 30 days, not forever (data minimisation)
+  BackendLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${BackendFunction}
+      RetentionInDays: 30
+
+Outputs:
+  ApiUrl:
+    Description: Backend address (use it for the SMS hook and Vault URLs)
+    Value: !Sub https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com
