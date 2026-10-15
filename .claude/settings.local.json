@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:tractive.com)",
+      "WebFetch(domain:heytag.lk)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

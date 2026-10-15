@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "deny": [
+      "Write(backend/**)",
+      "Edit(backend/**)",
+      "Write(supabase/**)",
+      "Edit(supabase/**)",
+      "Write(.env)",
+      "Edit(.env)",
+      "Write(CLAUDE.md)",
+      "Edit(CLAUDE.md)",
+      "Bash(rm:backend/**)",
+      "Bash(rm:supabase/**)"
+    ],
+    "allow": [
+      "Read(backend/**)",
+      "Read(supabase/**)",
+      "Read(docs/**)",
+      "Read(CLAUDE.md)"
+    ]
+  }
+}
