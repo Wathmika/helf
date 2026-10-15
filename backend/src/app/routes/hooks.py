@@ -33,21 +33,27 @@ def hook_error(code: int, message: str) -> JSONResponse:
 
 @router.post("/hooks/send-sms")
 async def send_sms(request: Request, cfg: Settings = Depends(settings)) -> JSONResponse:
+    log.info("send-sms hook called")
+
     # 1. Check this really came from Supabase Auth
     body = await request.body()
     try:
         payload = verify_standard_webhook(cfg.send_sms_hook_secret, request.headers, body)
-    except WebhookVerificationError:
+    except WebhookVerificationError as exc:
+        log.warning("signature verification failed: %s", exc)
         return hook_error(401, "Invalid signature")
 
     # 2. Check the number
     digits = normalize_phone(((payload.get("user") or {}).get("phone")) or "")
     otp = str(((payload.get("sms") or {}).get("otp")) or "")
     if not digits or not otp.isdigit() or not 4 <= len(otp) <= 10:
+        log.warning("missing or malformed phone/otp in payload")
         return hook_error(400, "Missing phone number or code")
     if not is_allowed_country(digits, cfg.allowed_sms_country_codes):
+        log.warning("country not allowed for %s", mask_phone(digits))
         return hook_error(400, "Sorry, we can't send codes to this country yet.")
     if is_sri_lankan(digits) and not is_sri_lankan_mobile(digits):
+        log.warning("Sri Lankan number not a mobile: %s", mask_phone(digits))
         return hook_error(400, "Please use a mobile number (07x).")
 
     # 3. Send
@@ -71,4 +77,5 @@ async def send_sms(request: Request, cfg: Settings = Depends(settings)) -> JSONR
     except (SmsError, httpx.HTTPError) as exc:
         log.error("OTP send failed via %s to %s: %s", route, mask_phone(digits), exc)
         return hook_error(503, "We couldn't send the code right now. Please try again in a minute.")
+    log.info("OTP sent via %s to %s", route, mask_phone(digits))
     return JSONResponse({})

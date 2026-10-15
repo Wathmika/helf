@@ -26,7 +26,14 @@ from .config import get_settings
 from .routes import account, hooks, internal, scan
 from .security import API_CSP, BASE_HEADERS
 
+# AWS Lambda's Python runtime pre-installs a handler on the root logger before this
+# module ever imports, so `logging.basicConfig(...)` is a silent no-op here (it only
+# configures the root logger when it has no handlers yet) -- and Lambda's own handler
+# defaults to WARNING, which drops every `log.info(...)` call in the app before it
+# reaches CloudWatch. Setting the level directly works whether or not a handler already
+# exists, on Lambda and when running locally with uvicorn alike.
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
+logging.getLogger().setLevel(logging.INFO)
 
 app = FastAPI(title="MediQR backend", docs_url=None, redoc_url=None, openapi_url=None)
 
