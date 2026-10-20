@@ -106,7 +106,8 @@ export interface PersonManager {
 }
 
 export interface PersonManagerWithUser extends PersonManager {
-  app_users: Pick<AppUser, "id" | "display_name">
+  // null for a co-manager other than yourself: app_users RLS only exposes your own row.
+  app_users: Pick<AppUser, "id" | "display_name"> | null
 }
 
 export interface CriticalAlert {

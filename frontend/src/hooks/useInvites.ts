@@ -4,17 +4,22 @@ import { useAuth } from "@/auth/AuthContext"
 import { supabase } from "@/lib/supabase"
 import type { PersonInvite, PersonManagerWithUser, ProfileFor } from "@/types/database"
 
+// code_hash is deliberately not granted to `authenticated` (never readable back out),
+// so this must list columns explicitly — `select("*")` fails with a permission error.
+const PERSON_INVITE_COLUMNS =
+  "id, person_id, role, note, created_by, created_at, expires_at, accepted_by, accepted_at, revoked_at"
+
 export function usePersonInvites(personId: string | undefined) {
   return useQuery({
     queryKey: ["person_invites", personId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("person_invites")
-        .select("*")
+        .select(PERSON_INVITE_COLUMNS)
         .eq("person_id", personId!)
         .order("created_at", { ascending: false })
       if (error) throw error
-      return (data ?? []) as PersonInvite[]
+      return (data ?? []) as unknown as PersonInvite[]
     },
     enabled: Boolean(personId),
   })
@@ -54,12 +59,28 @@ export function useCoManagers(personId: string | undefined) {
   return useQuery({
     queryKey: ["co_managers", personId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // No direct FK from person_managers.user_id to app_users.id (both point at
+      // auth.users.id separately), so PostgREST can't auto-embed app_users here —
+      // it has to be two queries, merged client-side.
+      const { data: managers, error } = await supabase
         .from("person_managers")
-        .select("*, app_users(id, display_name)")
+        .select("*")
         .eq("person_id", personId!)
       if (error) throw error
-      return (data ?? []) as unknown as PersonManagerWithUser[]
+
+      const userIds = (managers ?? []).map((m) => m.user_id)
+      // app_users RLS only exposes your own row, so this returns at most yourself —
+      // other managers simply come back missing, not as an error.
+      const { data: users, error: usersError } = userIds.length
+        ? await supabase.from("app_users").select("id, display_name").in("id", userIds)
+        : { data: [], error: null }
+      if (usersError) throw usersError
+
+      const usersById = new Map((users ?? []).map((u) => [u.id, u]))
+      return (managers ?? []).map((m) => ({
+        ...m,
+        app_users: usersById.get(m.user_id) ?? null,
+      })) as unknown as PersonManagerWithUser[]
     },
     enabled: Boolean(personId),
   })

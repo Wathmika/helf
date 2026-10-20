@@ -127,7 +127,7 @@ export function InvitesScreen() {
   const { personId } = useParams<{ personId: string }>()
   const { data: person } = usePerson(personId)
   const { data: invites, isLoading: invitesLoading } = usePersonInvites(personId)
-  const { data: coManagers, isLoading: coManagersLoading } = useCoManagers(personId)
+  const { data: coManagers, isLoading: coManagersLoading, isError: coManagersError } = useCoManagers(personId)
   const revoke = useRevokePersonInvite(personId)
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -166,6 +166,8 @@ export function InvitesScreen() {
           <div className="flex justify-center py-6">
             <Spinner />
           </div>
+        ) : coManagersError ? (
+          <p className="rounded-xl bg-danger-50 px-4 py-3 text-sm text-danger-700">{t("common.error.generic")}</p>
         ) : !coManagers || coManagers.length === 0 ? (
           <p className="py-2 text-sm text-gray-400">{t("sharing.coManagers.empty")}</p>
         ) : (
@@ -176,7 +178,7 @@ export function InvitesScreen() {
                   <Users size={16} />
                 </span>
                 <span className="flex-1 text-sm font-medium text-gray-900">
-                  {manager.app_users.display_name ?? t("sharing.coManagers.unnamed")}
+                  {manager.app_users?.display_name ?? t("sharing.coManagers.unnamed")}
                   {manager.user_id === user?.id && ` ${t("sharing.coManagers.you")}`}
                 </span>
                 <span
