@@ -1,0 +1,54 @@
+{
+  "app": {
+    "name": "helf"
+  },
+  "auth": {
+    "phoneTitle": "Welcome to helf",
+    "phoneSubtitle": "We'll text you a code to sign in. No passwords, ever.",
+    "phoneLabel": "Phone number",
+    "sendCode": "Send code",
+    "useEmailInstead": "Prefer email instead?",
+    "useEmailCode": "Use email code",
+    "usePhoneCode": "Use phone code instead",
+    "otpTitle": "Enter the code",
+    "otpSubtitle": "Sent by SMS to {{destination}}",
+    "resendIn": "Resend code in {{time}}",
+    "resend": "Resend code",
+    "verify": "Continue",
+    "welcomeNameLabel": "What should we call you?",
+    "welcomeLanguageLabel": "App language",
+    "continue": "Continue",
+    "errorInvalidCode": "That code is wrong. Check it and try again.",
+    "errorExpiredCode": "This code has expired. Request a new one.",
+    "errorRateLimited": "Too many attempts — wait a bit before trying again.",
+    "errorDisallowedCountry": "We can't send codes to that country yet."
+  },
+  "profiles": {
+    "title": "Your profiles",
+    "subtitleCount_one": "{{count}} person",
+    "subtitleCount_other": "{{count}} people",
+    "addProfile": "Add a profile",
+    "haveInviteCode": "Have an invite code?",
+    "haveInviteCodeHint": "From a sibling or relative",
+    "enterCode": "Enter",
+    "updatedToday": "Updated today",
+    "updatedDaysAgo_one": "Updated {{count}} day ago",
+    "updatedDaysAgo_other": "Updated {{count}} days ago",
+    "needsReview": "Needs review",
+    "limitReachedTitle": "You've reached 10 profiles",
+    "limitReachedBody": "helf allows up to 10 profiles per account. Ask a co-manager to remove one first.",
+    "emptyTitle": "No profiles yet",
+    "emptyBody": "A profile holds someone's allergies, conditions and emergency contacts, ready for a stranger to see if they're ever found in an emergency.",
+    "relationship": {
+      "self": "Self",
+      "parent": "Parent",
+      "child": "Child",
+      "spouse": "Spouse",
+      "other": "Other"
+    }
+  },
+  "nav": {
+    "profiles": "Profiles",
+    "account": "Account"
+  }
+}

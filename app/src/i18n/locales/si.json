@@ -1,0 +1,54 @@
+{
+  "app": {
+    "name": "helf"
+  },
+  "auth": {
+    "phoneTitle": "helf වෙත සාදරයෙන් පිළිගනිමු",
+    "phoneSubtitle": "පිවිසීම සඳහා කෙටි පණිවිඩයක් එවනු ලැබේ. මුරපදයක් කිසිවිටක අවශ්‍ය නොවේ.",
+    "phoneLabel": "දුරකථන අංකය",
+    "sendCode": "කේතය යවන්න",
+    "useEmailInstead": "ඊමේල් මගින් කැමතිද?",
+    "useEmailCode": "ඊමේල් කේතය භාවිතා කරන්න",
+    "usePhoneCode": "දුරකථන කේතය භාවිතා කරන්න",
+    "otpTitle": "කේතය ඇතුළත් කරන්න",
+    "otpSubtitle": "{{destination}} වෙත කෙටි පණිවිඩයක් එවා ඇත",
+    "resendIn": "{{time}} තුළ නැවත යවන්න",
+    "resend": "කේතය නැවත යවන්න",
+    "verify": "ඉදිරියට",
+    "welcomeNameLabel": "අපි ඔබව කුමක් ලෙස අමතන්නද?",
+    "welcomeLanguageLabel": "යොදන භාෂාව",
+    "continue": "ඉදිරියට",
+    "errorInvalidCode": "එම කේතය වැරදියි. නැවත පරීක්ෂා කර උත්සාහ කරන්න.",
+    "errorExpiredCode": "මෙම කේතයේ කාලය ඉකුත් වී ඇත. අලුත් කේතයක් ඉල්ලන්න.",
+    "errorRateLimited": "වරින් වර උත්සාහ වැඩියි — ස්වල්ප වෙලාවකින් නැවත උත්සාහ කරන්න.",
+    "errorDisallowedCountry": "එම රටට කේත යැවීමට තවම හැකියාවක් නැත."
+  },
+  "profiles": {
+    "title": "ඔබගේ පැතිකඩ",
+    "subtitleCount_one": "පුද්ගලයින් {{count}}",
+    "subtitleCount_other": "පුද්ගලයින් {{count}}",
+    "addProfile": "පැතිකඩක් එකතු කරන්න",
+    "haveInviteCode": "ආරාධනා කේතයක් තිබේද?",
+    "haveInviteCodeHint": "සහෝදරයෙකුගෙන් හෝ නෑදෑයෙකුගෙන්",
+    "enterCode": "ඇතුළත් කරන්න",
+    "updatedToday": "අද යවත්කාලීන කළා",
+    "updatedDaysAgo_one": "දින {{count}} කට පෙර යවත්කාලීන කළා",
+    "updatedDaysAgo_other": "දින {{count}} කට පෙර යවත්කාලීන කළා",
+    "needsReview": "නැවත පරීක්ෂා කළ යුතුයි",
+    "limitReachedTitle": "පැතිකඩ 10 සීමාවට පැමිණ ඇත",
+    "limitReachedBody": "එක් ගිණුමකට පැතිකඩ 10ක් දක්වා පමණක් helf ඉඩ දෙයි. පළමුව එකක් ඉවත් කරන්න ලෙස අනෙක් භාරකරුගෙන් ඉල්ලන්න.",
+    "emptyTitle": "තවම පැතිකඩක් නැත",
+    "emptyBody": "පැතිකඩක් තුළ අවදානම්, රෝග තත්ත්ව සහ හදිසි ඇමතුම් විස්තර ඇතුළත් වේ — හදිසි අවස්ථාවකදී කෙනෙකුට පෙනෙන පිණිස.",
+    "relationship": {
+      "self": "තමා",
+      "parent": "මාපියන්",
+      "child": "දරුවා",
+      "spouse": "විවාහක සහකරු/සහකාරිය",
+      "other": "වෙනත්"
+    }
+  },
+  "nav": {
+    "profiles": "පැතිකඩ",
+    "account": "ගිණුම"
+  }
+}
