@@ -7,7 +7,8 @@ export function ConfigBanner() {
 
   return (
     <div className="bg-[var(--warning-soft)] text-[var(--warning-ink)] text-sm font-medium px-5 py-2.5 text-center">
-      Supabase isn't configured yet — copy .env.example to .env and fill in VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY.
+      Demo mode — no Supabase connected, so this browser is using local sample data (nothing is sent anywhere). Every
+      screen and flow works; fill in .env later to connect the real backend.
     </div>
   )
 }

@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+/* Same brand tokens as the management app (app/src/index.css) — pulled
+   from the already-deployed public scan page so the promo site, the app,
+   and the thing a stranger actually scans all read as one product. */
+:root {
+  color-scheme: light;
+
+  --ground: #faf7f2;
+  --surface: #ffffff;
+  --raised: #f2eee5;
+  --border: #e5e1da;
+  --rule: #ede9e1;
+
+  --text: #1f2937;
+  --muted: #5b6472;
+
+  --accent: #0f766e;
+  --accent-soft: #dceeec;
+  --accent-ink: #0b4a45;
+  --deep: #0a3d39;
+
+  --positive: #15803d;
+  --positive-soft: #dcfae5;
+  --positive-ink: #04250e;
+
+  --negative: #c62828;
+  --negative-soft: #fbe4e2;
+  --negative-ink: #7a1414;
+
+  --warning: #b45309;
+  --warning-soft: #fff4e5;
+  --warning-ink: #7a3a06;
+
+  --ink: #141a21;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: 'Manrope', 'Noto Sans Sinhala', 'Noto Sans Tamil', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* ---------- entrance on load ---------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.6s var(--ease-out) both;
+}
+
+/* ---------- entrance on scroll (see hooks/useReveal.ts) ---------- */
+[data-reveal] {
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+[data-reveal='hidden'] {
+  opacity: 0;
+  transform: translateY(22px);
+}
+[data-reveal='shown'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- the scan sweep across a QR ---------- */
+@keyframes scan-sweep {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--sweep, 160px));
+    opacity: 0;
+  }
+}
+.scan-sweep {
+  animation: scan-sweep 2.4s ease-in-out infinite;
+}
+
+/* ---------- floating chips around the hero ---------- */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* ---------- a phone buzzing when the family is texted ---------- */
+@keyframes buzz {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+  40% {
+    transform: translateX(3px) rotate(1deg);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+.buzz {
+  animation: buzz 0.45s ease-in-out 2;
+}
+
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.ping-soft {
+  animation: ping-soft 1.8s ease-out infinite;
+}
+
+@keyframes step-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.screen-in {
+  animation: screen-in 0.45s var(--ease-out) both;
+}
+
+/* ---------- 3D flip card ---------- */
+.flip {
+  perspective: 1400px;
+}
+.flip-inner {
+  transition: transform 0.7s var(--ease-out);
+  transform-style: preserve-3d;
+}
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rise-in,
+  .scan-sweep,
+  .float,
+  .buzz,
+  .ping-soft,
+  .screen-in {
+    animation: none !important;
+  }
+  [data-reveal] {
+    transition: none;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .flip-inner {
+    transition: none;
+  }
+}

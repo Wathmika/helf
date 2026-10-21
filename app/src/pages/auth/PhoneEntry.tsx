@@ -44,7 +44,7 @@ export function PhoneEntry() {
   return (
     <AuthLayout>
       <div className="flex flex-col items-center text-center pb-5">
-        <div className="w-14 h-14 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center text-xl font-extrabold mb-4.5">
+        <div className="lg:hidden w-14 h-14 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center text-xl font-extrabold mb-4.5">
           h
         </div>
         <h1 className="text-2xl font-bold">{t('auth.phoneTitle')}</h1>

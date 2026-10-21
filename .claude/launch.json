@@ -14,6 +14,13 @@
       "runtimeArgs": ["run", "dev", "--", "--port", "5184"],
       "cwd": "app",
       "port": 5184
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5185"],
+      "cwd": "site",
+      "port": 5185
     }
   ]
 }

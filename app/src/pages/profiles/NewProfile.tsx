@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, PageContainer } from '../../components/ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { Button, Card, CenteredForm } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
+import { createDemoProfile } from '../../lib/demoStore'
 import type { ProfileFor } from '../../lib/profiles'
 
 const RELATIONSHIPS: ProfileFor[] = ['self', 'parent', 'child', 'spouse', 'other']
 
 export function NewProfile() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [name, setName] = useState('')
   const [relationship, setRelationship] = useState<ProfileFor>('parent')
   const [error, setError] = useState<string | null>(null)
@@ -15,10 +18,16 @@ export function NewProfile() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
     if (!supabase) {
-      setError('Supabase is not configured yet — see the banner at the top.')
+      // Demo mode — no backend configured, so this writes to the local
+      // demo store instead of calling create_person. See lib/demoStore.ts.
+      const personId = createDemoProfile(name, relationship)
+      queryClient.invalidateQueries({ queryKey: ['profiles'] })
+      navigate(`/person/${personId}`)
       return
     }
+
     setSaving(true)
     setError(null)
     const { data, error: rpcError } = await supabase.rpc('create_person', {
@@ -34,8 +43,7 @@ export function NewProfile() {
   }
 
   return (
-    <PageContainer>
-      <h1 className="text-2xl font-bold mb-4 pt-5 md:pt-0">Add a profile</h1>
+    <CenteredForm title="Add a profile">
       <form onSubmit={handleSubmit}>
         <Card>
           <label className="block mb-3.5">
@@ -68,6 +76,6 @@ export function NewProfile() {
           </Button>
         </Card>
       </form>
-    </PageContainer>
+    </CenteredForm>
   )
 }

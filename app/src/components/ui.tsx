@@ -8,18 +8,31 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
   )
 }
 
-/** Wraps a screen's content: full-bleed cards on a phone, a comfortably
- * centred column with room to breathe on wider screens. Every page except
- * the split-panel auth screens uses this so the desktop view never reads as
- * a stretched phone layout. */
-export function PageContainer({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`w-full max-w-[760px] mx-auto px-5 md:px-8 ${className}`}>{children}</div>
-  )
-}
-
 export function Stack({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <div className={`flex flex-col gap-3 ${className}`}>{children}</div>
+}
+
+/** For a single short form or placeholder (new profile, invite entry, a
+ * stubbed screen): vertically centred like the auth screens, instead of
+ * pinned top-left with a void underneath on a tall/wide monitor. `title`
+ * sits above the card, both centred together as one block. */
+export function CenteredForm({
+  title,
+  children,
+  maxWidth = 440,
+}: {
+  title: string
+  children: ReactNode
+  maxWidth?: number
+}) {
+  return (
+    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-5 py-10">
+      <div className="w-full" style={{ maxWidth }}>
+        <h1 className="text-2xl font-bold mb-4 text-center">{title}</h1>
+        {children}
+      </div>
+    </div>
+  )
 }
 
 type ButtonVariant = 'primary' | 'ghost' | 'danger'

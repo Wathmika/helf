@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from './supabase'
+import { listDemoProfiles } from './demoStore'
 
 export const MAX_PROFILES = 10
 
@@ -43,9 +44,9 @@ export function useProfiles() {
   return useQuery({
     queryKey: ['profiles'],
     queryFn: async (): Promise<ProfileSummary[]> => {
-      // Not configured yet — render the real empty state instead of an
-      // indefinite loading spinner, so the screen stays reviewable.
-      if (!supabase) return []
+      // Not configured yet — browse against a local demo store instead of
+      // blocking on a real backend. See lib/demoStore.ts.
+      if (!supabase) return listDemoProfiles()
 
       const { data, error } = await supabase
         .from('person_managers')
