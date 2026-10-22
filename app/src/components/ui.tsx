@@ -107,7 +107,7 @@ export function Switch({ on, onToggle, label }: { on: boolean; onToggle: () => v
       onClick={onToggle}
       className="flex-none w-[58px] h-11 -mr-1.5 flex items-center justify-center rounded-full"
     >
-      <span className={`relative block w-[46px] h-[28px] rounded-full transition-colors duration-200 ${on ? 'bg-[var(--accent)]' : 'bg-[var(--control)]'}`}>
+      <span className={`relative block w-[46px] h-[28px] rounded-full transition-colors duration-200 ${on ? 'bg-[var(--deep)]' : 'bg-[var(--control)]'}`}>
         <span
           className={`absolute top-[3px] w-[22px] h-[22px] rounded-full bg-white shadow-sm transition-all duration-200 ${on ? 'left-[21px]' : 'left-[3px]'}`}
         />

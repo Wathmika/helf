@@ -5,8 +5,9 @@ import './i18n'
 import App from './App.tsx'
 import { isSupabaseConfigured } from './lib/supabase'
 import { seedDemoFromUrl } from './lib/demoStore'
+import { seedDemoPeople } from './lib/demoPerson'
 
-if (!isSupabaseConfigured) seedDemoFromUrl()
+if (!isSupabaseConfigured && seedDemoFromUrl()) seedDemoPeople()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

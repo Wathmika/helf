@@ -60,6 +60,12 @@ export function createDemoProfile(fullName: string, personIsMy: ProfileFor): str
   return personId
 }
 
+/** Keep the list's summary in step after the person's record changes
+ * (name edits, a new "last checked" date). */
+export function patchDemoProfile(personId: string, patch: Partial<Pick<DemoProfile, 'fullName' | 'displayName' | 'freshestAt'>>) {
+  write(read().map((p) => (p.personId === personId ? { ...p, ...patch } : p)))
+}
+
 export function clearDemoProfiles() {
   write([])
 }
@@ -93,10 +99,11 @@ export function setDemoUser(user: DemoUser) {
 /** `?demo=family` on any URL loads a sample family (three people, one of
  * them overdue for a check) and a signed-in demo user, so every screen can
  * be looked at with data in a fresh browser. Demo mode only: main.tsx calls
- * this only while Supabase is not configured. */
-export function seedDemoFromUrl() {
+ * this only while Supabase is not configured, then seeds the full records
+ * (demoPerson.seedDemoPeople) when it returns true. */
+export function seedDemoFromUrl(): boolean {
   const params = new URLSearchParams(window.location.search)
-  if (params.get('demo') !== 'family') return
+  if (params.get('demo') !== 'family') return false
   const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
   write([
     { personId: 'demo-s1', fullName: 'Sunil Perera', displayName: 'Thaththa', personIsMy: 'parent', role: 'owner', freshestAt: daysAgo(12) },
@@ -107,4 +114,5 @@ export function seedDemoFromUrl() {
   params.delete('demo')
   const rest = params.toString()
   window.history.replaceState(null, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash)
+  return true
 }
