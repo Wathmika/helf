@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { Bike, Check, CreditCard, RotateCw, Smartphone } from 'lucide-react'
 import { QrMark } from '../components/QrMark'
 import { HelfBadge, HelfLockup } from '../components/Logo'
+import { SCAN_PAGE_URL } from '../config'
 import { SectionHead } from '../components/SectionHead'
 import { Reveal } from '../components/Reveal'
 
@@ -58,7 +59,7 @@ const OFFLINE_SAMPLE = [
 
 /** A QR that scales with the card (the shared QrMark is fixed-size). */
 function CardQr({ value }: { value?: string }) {
-  const content = value ?? (typeof window === 'undefined' ? '#demo' : `${window.location.origin}/#demo`)
+  const content = value ?? SCAN_PAGE_URL
   return (
     <div className="qri relative">
       <QRCodeSVG value={content} level="Q" fgColor="#134e4a" bgColor="#ffffff" style={{ width: '100%', height: 'auto' }} />
