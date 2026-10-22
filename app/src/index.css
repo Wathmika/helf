@@ -182,3 +182,45 @@ button {
     animation: none !important;
   }
 }
+
+/* ---------- printing a wallet card (QR codes screen) ----------
+   Only .print-sheet prints: both sides of card #78 at real card size,
+   85.6 x 54 mm, with a dashed cutting guide. */
+.print-sheet {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  .print-sheet,
+  .print-sheet * {
+    visibility: visible !important;
+  }
+  .print-sheet {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .print-sheet > p {
+    margin: 0 0 6mm;
+    font: 600 10pt/1.4 'Manrope', sans-serif;
+    color: #000;
+  }
+  .print-card {
+    width: 85.6mm;
+    margin-bottom: 8mm;
+    outline: 0.25mm dashed #888;
+    outline-offset: 1.5mm;
+    break-inside: avoid;
+  }
+  .print-card .face {
+    box-shadow: none !important;
+  }
+}

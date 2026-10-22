@@ -10,10 +10,11 @@ import type {
   PersonFields,
   PublicProfile,
 } from './person'
+import type { QrToken, ScanEvent } from './qr'
 
 /*
   Demo-mode stand-in for one person's full record (people + its five lists,
-  managers and invites), kept in this browser's localStorage only. Used
+  managers, invites, QR codes and scans), kept in this browser's localStorage only. Used
   only while Supabase isn't configured; lib/person.ts switches to the real
   tables and RPCs the moment it is.
 */
@@ -26,6 +27,8 @@ interface DemoRecord {
   detail: PersonDetail
   coManagers: { displayName: string; role: 'editor' }[]
   invites: DemoInvite[]
+  tokens?: QrToken[]
+  scans?: ScanEvent[]
 }
 
 const KEY = 'helf_demo_people'
@@ -207,6 +210,111 @@ export function revokeDemoInvite(personId: string, inviteId: string) {
   )
 }
 
+// ---- QR codes and scans ----------------------------------------------------
+
+export function demoTokens(personId: string): QrToken[] {
+  return [...(load(personId)?.tokens ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))
+}
+
+export function demoScans(personId: string): ScanEvent[] {
+  return [...(load(personId)?.scans ?? [])].sort((a, b) => b.scanned_at.localeCompare(a.scanned_at))
+}
+
+/** Same shape as private.new_token(): 24 URL-safe characters. */
+function demoToken(): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+  return Array.from({ length: 24 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('')
+}
+
+export function issueDemoToken(personId: string, label: string | null): QrToken {
+  const row: QrToken = { id: uid(), token: demoToken(), label, status: 'active', created_at: new Date().toISOString(), revoked_at: null }
+  save(personId, (r) => (r.tokens = [row, ...(r.tokens ?? [])]), false)
+  return row
+}
+
+export function revokeDemoToken(personId: string, tokenId: string) {
+  save(
+    personId,
+    (r) => {
+      const t = r.tokens?.find((x) => x.id === tokenId && x.status === 'active')
+      if (!t) throw new Error('not found or not allowed')
+      t.status = 'revoked'
+      t.revoked_at = new Date().toISOString()
+    },
+    false,
+  )
+}
+
+const ALERT_LABEL_EN: Record<string, string> = {
+  blood_thinner: 'BLOOD THINNER',
+  diabetes_insulin: 'DIABETIC ON INSULIN',
+  epilepsy: 'EPILEPSY',
+  heart_condition: 'HEART CONDITION',
+  pacemaker_implant: 'PACEMAKER/IMPLANT',
+  severe_allergy: 'SEVERE ALLERGY',
+  pregnancy: 'PREGNANT',
+  dementia: 'DEMENTIA',
+  hearing_impairment: 'HEARING IMPAIRED',
+  vision_impairment: 'VISION IMPAIRED',
+}
+
+/**
+ * Demo-only copy of private.build_offline_qr_text()
+ * (supabase/migrations/20261012000100_family_qr_alerts_privacy.sql): the
+ * same lines, priorities and 300-byte budget. Real mode calls the
+ * offline_qr_text RPC instead.
+ */
+export function demoOfflineText(tokenId: string, link: string): string {
+  const all = readAll()
+  const record = Object.values(all).find((r) => r.tokens?.some((t) => t.id === tokenId))
+  if (!record) throw new Error('not allowed')
+  const token = record.tokens!.find((t) => t.id === tokenId)!
+  if (token.status !== 'active') throw new Error('this QR has been deactivated')
+  const p = record.detail
+  const sevRank = (s: string) => SEVERITIES.indexOf(s as (typeof SEVERITIES)[number])
+  const lines: { prio: number; ord: number; line: string }[] = []
+  lines.push({ prio: 0, ord: 0, line: 'EMERGENCY MEDICAL INFO' })
+  const age = p.show_age ? ageFrom(p.date_of_birth) : null
+  lines.push({ prio: 1, ord: 1, line: (p.display_name || p.full_name) + (age !== null ? `, ${age}` : '') })
+  p.critical_alerts
+    .filter((a) => a.show_on_scan)
+    .sort((a, b) => ALERT_CODES.indexOf(a.code) - ALERT_CODES.indexOf(b.code))
+    .forEach((a, i) => lines.push({ prio: 2, ord: 11 + i, line: `!! ${ALERT_LABEL_EN[a.code]}${a.note ? `: ${a.note}` : ''}` }))
+  p.allergies
+    .filter((a) => a.show_on_scan)
+    .sort(
+      (a, b) =>
+        Number(a.severity === 'unknown') - Number(b.severity === 'unknown') ||
+        sevRank(b.severity) - sevRank(a.severity) ||
+        a.substance.localeCompare(b.substance),
+    )
+    .forEach((a, i) =>
+      lines.push({ prio: 3, ord: 21 + i, line: `Allergy: ${a.substance}${a.severity !== 'unknown' ? ` (${a.severity.replace('_', '-')})` : ''}` }),
+    )
+  p.emergency_contacts
+    .filter((c) => c.show_on_scan)
+    .forEach((c) => lines.push({ prio: c.priority === 1 ? 4 : 7, ord: 30 + c.priority, line: `Call ${c.name} (${c.relationship}) ${c.phone_e164}` }))
+  lines.push({ prio: 5, ord: 90, line: 'Ambulance: 1990' })
+  const dated = p.info_confirmed_at && p.info_confirmed_at > p.content_updated_at ? p.info_confirmed_at : p.content_updated_at
+  lines.push({ prio: 6, ord: 91, line: `Info dated ${new Date(dated).toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' })}` })
+  p.conditions
+    .filter((c) => c.show_on_scan)
+    .sort((a, b) => (a.since_year ?? 9999) - (b.since_year ?? 9999) || a.name.localeCompare(b.name))
+    .forEach((c, i) => lines.push({ prio: 8, ord: 41 + i, line: `Has: ${c.name}` }))
+  if (p.show_communication_needs && p.communication_needs) lines.push({ prio: 9, ord: 50, line: `Note: ${p.communication_needs}` })
+  if (p.show_blood_group && p.blood_group && p.blood_group !== 'unknown') lines.push({ prio: 10, ord: 51, line: `Blood group (info only): ${p.blood_group}` })
+
+  // Keep lines in priority order while the running byte count (line + newline)
+  // stays within 300, then print the kept ones in reading order.
+  const bytes = (x: string) => new TextEncoder().encode(x).length
+  let running = 0
+  const kept = [...lines]
+    .sort((a, b) => a.prio - b.prio || a.ord - b.ord)
+    .filter((l) => (running += bytes(l.line) + 1) <= 300)
+    .sort((a, b) => a.ord - b.ord)
+  return `${kept.map((l) => l.line).join('\n')}\nMore: ${link}`
+}
+
 /**
  * Demo-only copy of private.build_public_profile()
  * (supabase/migrations/20261012000000_initial_schema.sql), field for field
@@ -321,10 +429,51 @@ export function seedDemoPeople() {
 
   const s3 = blankDetail('demo-s3', 'Kasun Perera', 'Kasun', 'child', daysAgo(0))
 
+  // QR codes and scans. Thaththa's helmet sticker was lost and switched off;
+  // the wallet card has been scanned twice (one with location). Kasun has
+  // none yet, to show the first-run screen.
+  const at = (days: number, hour: number, minute: number) => {
+    const d = new Date(Date.now() - days * 86_400_000)
+    d.setHours(hour, minute, 0, 0)
+    return d.toISOString()
+  }
+  const t1 = { id: 'qr-s1-card', token: 'Xk2pQ9vLm4Rt7WbN1cYz0aHe', label: 'Wallet card', status: 'active' as const, created_at: at(60, 10, 12), revoked_at: null }
+  const t2 = { id: 'qr-s1-helmet', token: 'Pa8sDf3Gh6Jk9Lq2We5Rt0Yu', label: 'Helmet sticker', status: 'revoked' as const, created_at: at(60, 10, 15), revoked_at: at(18, 19, 40) }
+  const t3 = { id: 'qr-s1-helmet2', token: 'Zx4Cv7Bn1Mq3Wr6Ty9Ui2Op5', label: 'Helmet sticker (new)', status: 'active' as const, created_at: at(18, 19, 44), revoked_at: null }
+  const t4 = { id: 'qr-s2-card', token: 'Lk8Jh5Gf2Ds9Aq6Wz3Xc0Vb7', label: 'Wallet card', status: 'active' as const, created_at: at(150, 9, 2), revoked_at: null }
+  const t5 = { id: 'qr-s2-wall', token: 'Nm1Bv4Cx7Za0Qs3Wd6Ef9Rg2', label: 'Phone wallpaper', status: 'active' as const, created_at: at(150, 9, 5), revoked_at: null }
+  const scan = (id: number, token_id: string, scanned_at: string, extra: Partial<ScanEvent> = {}): ScanEvent => ({
+    id,
+    token_id,
+    scanned_at,
+    approx_lat: null,
+    approx_lng: null,
+    location_added_at: null,
+    country_code: 'LK',
+    family_notified_at: scanned_at,
+    ...extra,
+  })
+
   const all: Record<string, DemoRecord> = {
-    'demo-s1': { detail: s1, coManagers: [{ displayName: 'Nadeesha', role: 'editor' }], invites: [] },
-    'demo-s2': { detail: s2, coManagers: [{ displayName: 'Nadeesha', role: 'editor' }], invites: [] },
-    'demo-s3': { detail: s3, coManagers: [], invites: [] },
+    'demo-s1': {
+      detail: s1,
+      coManagers: [{ displayName: 'Nadeesha', role: 'editor' }],
+      invites: [],
+      tokens: [t1, t2, t3],
+      scans: [
+        scan(3, t1.id, at(3, 15, 14)),
+        scan(2, t1.id, at(27, 8, 42), { approx_lat: 6.872, approx_lng: 79.889, location_added_at: at(27, 8, 43) }),
+        scan(1, t2.id, at(59, 10, 30)),
+      ],
+    },
+    'demo-s2': {
+      detail: s2,
+      coManagers: [{ displayName: 'Nadeesha', role: 'editor' }],
+      invites: [],
+      tokens: [t4, t5],
+      scans: [scan(4, t4.id, at(9, 17, 5), { approx_lat: 6.865, approx_lng: 79.899, location_added_at: at(9, 17, 7) })],
+    },
+    'demo-s3': { detail: s3, coManagers: [], invites: [], tokens: [], scans: [] },
   }
   writeAll(all)
 }

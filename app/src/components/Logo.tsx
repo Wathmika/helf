@@ -21,6 +21,23 @@ export function HelfMark({ variant = 'light', className = '' }: { variant?: Vari
   )
 }
 
+/** The mark on its dark tile with a white ring — what sits in the middle of
+ * every QR (same as the site's HelfBadge). */
+export function HelfBadge({ size }: { size: number | string }) {
+  return (
+    <span className="flex items-center justify-center ring-[3px] ring-white" style={{ width: size, height: size, borderRadius: '24%', background: '#134e4a' }}>
+      <HelfMark variant="dark" className="w-[74%] h-[74%] translate-y-[4%]" />
+    </span>
+  )
+}
+
+/** The same badge as an image, for QR pictures drawn on a canvas. */
+export const HELF_BADGE_DATA_URL =
+  'data:image/svg+xml;charset=utf-8,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="11.5" fill="#134e4a"/><g transform="translate(6.24 7.2) scale(0.74)"><path d="${BUBBLE}" fill="#2dd4bf"/><path d="M24 13.5v14M17 20.5h14" stroke="#134e4a" stroke-width="4.4" stroke-linecap="round"/></g></svg>`,
+  )
+
 /** Mark + "helf.lk" wordmark. Sized by font-size (em). */
 export function HelfLockup({ variant = 'light', lk = true, className = '' }: { variant?: Variant; lk?: boolean; className?: string }) {
   const c = COLOURS[variant]

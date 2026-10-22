@@ -1,0 +1,194 @@
+/* Tag design #78 ("Mosaic — emerald sheen"), copied unchanged from
+   site/src/index.css so the printed card matches the one on the promo
+   site. Sized by container query units: set the card's width and
+   everything inside scales with it. */
+.tag78 {
+  container-type: inline-size;
+  aspect-ratio: 1.586;
+}
+.tag78 .face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 4.2cqw;
+  color: #fff;
+  background: linear-gradient(150deg, #0f766e 0%, #115e59 55%, #134e4a 100%);
+  box-shadow:
+    0 1px 2px rgba(10, 40, 36, 0.12),
+    0 14px 34px -14px rgba(10, 40, 36, 0.35);
+}
+.tag78 .face.back {
+  background: linear-gradient(210deg, #0f766e 0%, #115e59 55%, #134e4a 100%);
+}
+.tag78 .face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.16) 45%, transparent 60%),
+    radial-gradient(120% 90% at 100% 0, rgba(94, 234, 212, 0.22), transparent 60%);
+}
+.tag78 .face::after {
+  content: '';
+  position: absolute;
+  top: 49cqw;
+  left: 76cqw;
+  right: -2cqw;
+  bottom: -2cqw;
+  pointer-events: none;
+  opacity: 0.9;
+  background: radial-gradient(circle, rgba(204, 251, 241, 0.28) 38%, transparent 42%) 0 0 / 1.5cqw 1.5cqw;
+  -webkit-mask: linear-gradient(135deg, transparent 30%, #000);
+  mask: linear-gradient(135deg, transparent 30%, #000);
+}
+.tag78 .face.back::after {
+  left: -2cqw;
+  right: 76cqw;
+  -webkit-mask: linear-gradient(225deg, transparent 30%, #000);
+  mask: linear-gradient(225deg, transparent 30%, #000);
+}
+.tag78 .brand {
+  position: absolute;
+  left: 5.4cqw;
+  top: 5.4cqw;
+  font-size: 4.4cqw;
+}
+.tag78 .hl {
+  position: absolute;
+  left: 5.4cqw;
+  top: 14cqw;
+  width: 50cqw;
+  font: 850 7.2cqw/0.9 'Archivo', 'Manrope', sans-serif;
+  font-stretch: 62%;
+  letter-spacing: 0.07cqw;
+  text-transform: uppercase;
+}
+.tag78 .hl em {
+  display: block;
+  font-style: normal;
+  color: #5eead4;
+}
+.tag78 .flow {
+  position: absolute;
+  left: 5.4cqw;
+  top: 47.4cqw;
+  display: flex;
+  gap: 1.2cqw;
+  font: 700 2.1cqw/1 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.13cqw;
+  text-transform: uppercase;
+  color: #5eead4;
+}
+.tag78 .chip {
+  position: absolute;
+  left: 5.4cqw;
+  top: 53cqw;
+  padding: 1cqw 2cqw;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f0fdfa;
+  font: 800 2cqw/1.3 'Manrope', sans-serif;
+  letter-spacing: 0.16cqw;
+  text-transform: uppercase;
+}
+.tag78 .qrpanel {
+  position: absolute;
+  left: 58.6cqw;
+  top: 10.4cqw;
+  width: 36cqw;
+}
+.tag78 .qrpanel .qri {
+  background: #fff;
+  border-radius: 2.4cqw;
+  padding: 1.4cqw;
+  box-shadow: 0 0 0 0.6cqw #115e59;
+  line-height: 0;
+}
+.tag78 .cap {
+  margin-top: 1.3cqw;
+  font: 400 2cqw/1.25 'Manrope', sans-serif;
+  color: #ccfbf1;
+}
+.tag78 .cap b {
+  display: block;
+  font-weight: 700;
+  font-size: 2.2cqw;
+  letter-spacing: 0.13cqw;
+  text-transform: uppercase;
+  color: #fff;
+}
+.tag78 .back .qrpanel {
+  left: 5.4cqw;
+  top: 14cqw;
+  /* helf app: 34cqw rather than #78's 30, because the offline text makes a
+     dense code (85 modules); this keeps each module about 0.34 mm when
+     printed at card size. */
+  width: 34cqw;
+}
+.tag78 .eyebrow {
+  position: absolute;
+  left: 41cqw;
+  top: 16cqw;
+  font: 700 2cqw/1 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.2cqw;
+  text-transform: uppercase;
+  color: #5eead4;
+}
+.tag78 .steps {
+  position: absolute;
+  left: 41cqw;
+  top: 21cqw;
+  right: 5.4cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqw;
+}
+.tag78 .steps li {
+  display: flex;
+  gap: 2cqw;
+  align-items: baseline;
+  font: 700 3cqw/1.2 'Manrope', sans-serif;
+}
+.tag78 .steps li span {
+  font: 700 2.1cqw/1 'JetBrains Mono', ui-monospace, monospace;
+  color: #5eead4;
+}
+.tag78 .steps li small {
+  display: block;
+  font-weight: 400;
+  font-size: 2.2cqw;
+  color: #ccfbf1;
+  margin-top: 0.4cqw;
+}
+
+/* helf app addition: the person's name and key alerts on the front, in the
+   empty band between the headline and the flow line. */
+.tag78 .who {
+  position: absolute;
+  left: 5.4cqw;
+  top: 36cqw;
+  width: 50cqw;
+}
+.tag78 .who b {
+  display: block;
+  font: 800 3.6cqw/1.1 'Manrope', sans-serif;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tag78 .who span {
+  display: block;
+  margin-top: 0.8cqw;
+  font: 800 1.9cqw/1.25 'Manrope', sans-serif;
+  letter-spacing: 0.12cqw;
+  text-transform: uppercase;
+  color: #5eead4;
+}
+
+/* Printing: keep the card's colours (browsers drop backgrounds by default). */
+.tag78 .face {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
