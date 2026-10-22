@@ -76,20 +76,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-h1,
-h2,
-h3,
-p {
-  margin: 0;
-}
-
 button {
   font-family: inherit;
 }
 
-/* In the base layer so a component's own focus ring (focus-visible:outline-none
-   + ring utilities) can replace it — unlayered CSS would always win. */
+/* In the base layer so utilities can override them: unlayered CSS always
+   beats Tailwind's classes (a plain `p { margin: 0 }` here used to cancel
+   every mt-* on a paragraph), and a component's own focus ring
+   (focus-visible:outline-none + ring utilities) must be able to replace
+   the default one. */
 @layer base {
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
   :focus-visible {
     outline: 3px solid var(--accent);
     outline-offset: 3px;

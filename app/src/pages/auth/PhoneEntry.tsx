@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Mail } from 'lucide-react'
 import { AuthLayout } from '../../components/AuthLayout'
@@ -17,6 +17,8 @@ const PROBLEM_KEY: Record<PhoneProblem, string> = {
 export function PhoneEntry() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  // Set by the account screen after "Delete my account" succeeds.
+  const accountDeleted = Boolean((useLocation().state as { accountDeleted?: boolean } | null)?.accountDeleted)
   const [country, setCountry] = useState('94')
   const [phone, setPhone] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -51,6 +53,11 @@ export function PhoneEntry() {
 
   return (
     <AuthLayout title={t('auth.phoneTitle')} subtitle={t('auth.phoneSubtitle')}>
+      {accountDeleted && (
+        <p role="status" className="mb-5 rounded-[12px] bg-[var(--positive-soft)] text-[var(--positive-ink)] px-4 py-3 text-[14px] font-semibold">
+          {t('account.deletedNotice')}
+        </p>
+      )}
       <form onSubmit={handleSubmit} noValidate>
         <label htmlFor="phone" className="block text-[14px] font-semibold mb-2">
           {t('auth.phoneLabel')}

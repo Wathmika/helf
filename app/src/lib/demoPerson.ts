@@ -477,3 +477,50 @@ export function seedDemoPeople() {
   }
   writeAll(all)
 }
+
+// ---- account ---------------------------------------------------------------
+
+/** Demo-only copy of export_person_data(): the same top-level keys, built
+ * from this browser's sample record. Real mode calls the RPC. */
+export function demoExport(personId: string): Record<string, unknown> | null {
+  const record = load(personId)
+  if (!record) return null
+  const { role: _role, person_is_my: _isMy, critical_alerts, allergies, conditions, medications, emergency_contacts, ...person } = record.detail
+  void _role
+  void _isMy
+  return {
+    exported_at: new Date().toISOString(),
+    person,
+    critical_alerts,
+    allergies,
+    conditions,
+    medications,
+    emergency_contacts,
+    managers: demoManagers(personId).map((m) => ({ user_id: m.userId, role: m.role })),
+    qr_codes: (record.tokens ?? []).map(({ label, status, created_at, revoked_at }) => ({ label, status, created_at, revoked_at })),
+    scans: demoScans(personId).map((s) => ({
+      scanned_at: s.scanned_at,
+      country: s.country_code,
+      approx_lat: s.approx_lat,
+      approx_lng: s.approx_lng,
+      family_notified_at: s.family_notified_at,
+    })),
+  }
+}
+
+/** Co-managers of a profile, longest-standing first — the order
+ * prepare_account_deletion uses to pick who takes over. */
+export function demoCoManagers(personId: string): string[] {
+  return (load(personId)?.coManagers ?? []).map((m) => m.displayName)
+}
+
+/** Demo "delete my account": forget everything this browser holds. */
+export function demoDeleteAccount() {
+  for (const key of [KEY, 'helf_demo_profiles', 'helf_demo_user']) {
+    try {
+      localStorage.removeItem(key)
+    } catch {
+      // nothing to remove
+    }
+  }
+}
