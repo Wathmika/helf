@@ -1,0 +1,131 @@
+/*
+  The public pages' own styles (from the former site/ project). Shared
+  tokens, the base reset, rise-in / float / ping-soft / screen-in and
+  card #78 come from ../index.css and ../components/card78.css.
+
+  .site-theme wraps every public page: it brings back the promo site's warm
+  ground and lines (the dashboard uses a white page with mint-stone panels),
+  so the two keep their own look in one build.
+*/
+.site-theme {
+  --ground: #faf7f2;
+  --raised: #f2eee5;
+  --border: #e5e1da;
+  --rule: #ede9e1;
+  --muted: #5b6472;
+  min-height: 100vh;
+  background: var(--ground);
+  color: var(--text);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+html:has(.site-theme) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* ---------- entrance on scroll (see components/Reveal.tsx) ---------- */
+[data-reveal] {
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+[data-reveal='hidden'] {
+  opacity: 0;
+  transform: translateY(22px);
+}
+[data-reveal='shown'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- the scan sweep across a QR ---------- */
+@keyframes scan-sweep {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--sweep, 160px));
+    opacity: 0;
+  }
+}
+.scan-sweep {
+  animation: scan-sweep 2.4s ease-in-out infinite;
+}
+
+/* ---------- a phone buzzing when the family is texted ---------- */
+@keyframes buzz {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+  40% {
+    transform: translateX(3px) rotate(1deg);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+.buzz {
+  animation: buzz 0.45s ease-in-out 2;
+}
+
+@keyframes step-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- 3D flip card ---------- */
+.flip {
+  perspective: 1400px;
+}
+.flip-inner {
+  transition: transform 0.7s var(--ease-out);
+  transform-style: preserve-3d;
+}
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.site-theme) {
+    scroll-behavior: auto;
+  }
+  .scan-sweep,
+  .buzz {
+    animation: none !important;
+  }
+  [data-reveal] {
+    transition: none;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .flip-inner {
+    transition: none;
+  }
+}
