@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './i18n'
 import App from './App.tsx'
+import { isSupabaseConfigured } from './lib/supabase'
+import { seedDemoFromUrl } from './lib/demoStore'
+
+if (!isSupabaseConfigured) seedDemoFromUrl()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

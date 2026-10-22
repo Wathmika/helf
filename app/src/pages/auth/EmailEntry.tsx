@@ -1,9 +1,13 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Button, Card } from '../../components/ui'
+import { ArrowRight, Smartphone } from 'lucide-react'
 import { AuthLayout } from '../../components/AuthLayout'
+import { Button, Field } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
+import { authErrorKey } from '../../lib/authErrors'
+
+const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export function EmailEntry() {
   const { t } = useTranslation()
@@ -14,58 +18,58 @@ export function EmailEntry() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const address = email.trim()
+    if (!LOOKS_LIKE_EMAIL.test(address)) {
+      setError(t('auth.errorEmail'))
+      return
+    }
     setError(null)
-    setSending(true)
 
     if (!supabase) {
-      navigate('/login/otp', { state: { destination: email, channel: 'email' } })
+      navigate('/login/otp', { state: { destination: address, channel: 'email' } })
       return
     }
 
-    const { error: otpError } = await supabase.auth.signInWithOtp({ email })
+    setSending(true)
+    const { error: otpError } = await supabase.auth.signInWithOtp({ email: address })
     setSending(false)
     if (otpError) {
-      setError(otpError.message)
+      setError(t(authErrorKey(otpError)))
       return
     }
-    navigate('/login/otp', { state: { destination: email, channel: 'email' } })
+    navigate('/login/otp', { state: { destination: address, channel: 'email' } })
   }
 
   return (
-    <AuthLayout>
-      <div className="flex flex-col items-center text-center pb-5">
-        <div className="lg:hidden w-14 h-14 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center text-xl font-extrabold mb-4.5">
-          h
-        </div>
-        <h1 className="text-2xl font-bold">{t('auth.phoneTitle')}</h1>
-        <p className="text-sm text-[var(--muted)] mt-1">{t('auth.phoneSubtitle')}</p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <label className="block mb-3.5">
-            <span className="block text-[13px] font-medium text-[var(--muted)] mb-1.5">Email address</span>
-            <input
-              className="w-full h-11 rounded-[var(--radius-ctl)] border-[1.5px] border-[var(--border)] bg-[var(--surface)] px-3 text-base outline-none focus:border-[var(--accent)]"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-          {error && <p className="text-sm text-[var(--negative)] mb-3">{error}</p>}
-          <Button type="submit" disabled={sending}>
-            {t('auth.sendCode')}
-          </Button>
-        </Card>
+    <AuthLayout title={t('auth.emailTitle')} subtitle={t('auth.emailSubtitle')}>
+      <form onSubmit={handleSubmit} noValidate>
+        <Field
+          label={t('auth.emailLabel')}
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder={t('auth.emailPlaceholder')}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            if (error) setError(null)
+          }}
+          error={error}
+        />
+        <Button type="submit" disabled={sending || email.trim().length === 0} className="mt-2 group">
+          {sending ? t('auth.sending') : t('auth.sendCode')}
+          {!sending && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
+        </Button>
       </form>
 
-      <p className="text-center text-[13px] text-[var(--muted)] mt-3.5">
-        <Link to="/login" className="text-[var(--accent)] font-semibold">
-          {t('auth.usePhoneCode')}
+      <div className="mt-6 pt-5 border-t border-[var(--rule)] flex justify-center">
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-1.5 h-10 px-2 rounded-lg text-[14px] font-bold text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-colors"
+        >
+          <Smartphone size={15} /> {t('auth.usePhoneCode')}
         </Link>
-      </p>
+      </div>
     </AuthLayout>
   )
 }

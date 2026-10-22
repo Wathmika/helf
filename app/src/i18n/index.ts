@@ -23,4 +23,10 @@ void i18n
     interpolation: { escapeValue: false },
   })
 
+// Keep <html lang> in step, so screen readers and font fallback pick the
+// right script.
+const syncLang = (lng: string) => document.documentElement.setAttribute('lang', lng)
+i18n.on('languageChanged', syncLang)
+if (i18n.resolvedLanguage) syncLang(i18n.resolvedLanguage)
+
 export default i18n

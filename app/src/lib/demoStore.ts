@@ -63,3 +63,48 @@ export function createDemoProfile(fullName: string, personIsMy: ProfileFor): str
 export function clearDemoProfiles() {
   write([])
 }
+
+// The demo stand-in for this user's app_users row (display_name,
+// preferred_language).
+export interface DemoUser {
+  displayName: string
+  language: 'si' | 'ta' | 'en'
+}
+
+const USER_KEY = 'helf_demo_user'
+
+export function getDemoUser(): DemoUser | null {
+  try {
+    const raw = localStorage.getItem(USER_KEY)
+    return raw ? (JSON.parse(raw) as DemoUser) : null
+  } catch {
+    return null
+  }
+}
+
+export function setDemoUser(user: DemoUser) {
+  try {
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+  } catch {
+    // Storage blocked — the name just won't survive a reload.
+  }
+}
+
+/** `?demo=family` on any URL loads a sample family (three people, one of
+ * them overdue for a check) and a signed-in demo user, so every screen can
+ * be looked at with data in a fresh browser. Demo mode only: main.tsx calls
+ * this only while Supabase is not configured. */
+export function seedDemoFromUrl() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('demo') !== 'family') return
+  const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
+  write([
+    { personId: 'demo-s1', fullName: 'Sunil Perera', displayName: 'Thaththa', personIsMy: 'parent', role: 'owner', freshestAt: daysAgo(12) },
+    { personId: 'demo-s2', fullName: 'Sriyani Perera', displayName: 'Amma (Sriyani)', personIsMy: 'parent', role: 'owner', freshestAt: daysAgo(104) },
+    { personId: 'demo-s3', fullName: 'Kasun Perera', displayName: 'Kasun', personIsMy: 'child', role: 'owner', freshestAt: daysAgo(0) },
+  ])
+  if (!getDemoUser()) setDemoUser({ displayName: 'Minaga', language: 'en' })
+  params.delete('demo')
+  const rest = params.toString()
+  window.history.replaceState(null, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash)
+}

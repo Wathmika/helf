@@ -2,27 +2,35 @@
 
 /*
   helf design tokens — single committed light theme.
-  These colours are taken from the already-deployed public scan page
-  (docs/scan-page-preview-*.html) so the management app and the page a
-  stranger scans read as one product. See the approved design direction
-  mockups for the composition this is built from.
+  Shared with the promo site (site/src/index.css): warm ground, white
+  surfaces, teal accent and the deep-teal band, so the site, sign-in and
+  dashboard read as one product.
 */
 :root {
   color-scheme: only light;
 
-  --ground: #faf7f2;
+  /* App screens (editorial-greeting style, dealt by the taste skill): a white
+     page, structure carried by tonal panels tinted one step toward helf's
+     teal — a clinic's mint-stone rather than the site's warm cream. */
+  --ground: #ffffff;
   --surface: #ffffff;
-  --raised: #f2eee5;
-  --border: #e5e1da;
-  --rule: #ede9e1;
-  --control: #d8d2c7;
+  --panel: #f2f6f5;      /* tonal panel, one step off white */
+  --panel-row: #fafcfb;  /* row card inside a panel, one step lighter */
+  --raised: #eaf0ee;     /* chips, quiet buttons */
+  --active: #e6edeb;     /* the nav pill */
+  --border: #dfe6e4;
+  --rule: #e9efed;
+  --control: #cdd7d4;
 
   --text: #1f2937;
-  --muted: #5b6472;
+  --muted: #56606c;
 
   --accent: #0f766e;
   --accent-soft: #dceeec;
   --accent-ink: #0b4a45;
+  --deep: #0a3d39;
+  --aqua: #5eead4;
+  --ink: #141a21;
 
   --positive: #15803d;
   --positive-soft: #dcfae5;
@@ -44,8 +52,10 @@
   --p-3: #5b4b8a; --p-3-soft: #e8e3f3;
   --p-4: #8a6a1f; --p-4-soft: #f4e9d2;
 
-  --radius-card: 20px;
-  --radius-ctl: 10px;
+  --radius-card: 22px;
+  --radius-ctl: 14px;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 * {
@@ -75,4 +85,100 @@ p {
 
 button {
   font-family: inherit;
+}
+
+/* In the base layer so a component's own focus ring (focus-visible:outline-none
+   + ring utilities) can replace it — unlayered CSS would always win. */
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* ---------- motion, same vocabulary as the promo site ---------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: rise-in 0.55s var(--ease-out) both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.screen-in {
+  animation: screen-in 0.4s var(--ease-out) both;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.ping-soft {
+  animation: ping-soft 1.8s ease-out infinite;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+.shake {
+  animation: shake 0.3s ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .screen-in,
+  .float,
+  .ping-soft,
+  .shake {
+    animation: none !important;
+  }
 }

@@ -1,76 +1,112 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Button, Card } from '../../components/ui'
+import { ArrowRight, Check } from 'lucide-react'
 import { AuthLayout } from '../../components/AuthLayout'
+import { Button, Field } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
-import i18n from '../../i18n'
+import { setDemoUser } from '../../lib/demoStore'
 
-const LANGUAGES: { code: 'si' | 'ta' | 'en'; label: string }[] = [
-  { code: 'si', label: 'සිංහල' },
-  { code: 'ta', label: 'தமிழ்' },
-  { code: 'en', label: 'English' },
+type Lang = 'si' | 'ta' | 'en'
+
+const TILES: { code: Lang; native: string; latin: string }[] = [
+  { code: 'si', native: 'සිංහල', latin: 'Sinhala' },
+  { code: 'ta', native: 'தமிழ்', latin: 'Tamil' },
+  { code: 'en', native: 'English', latin: 'English' },
 ]
 
 export function Welcome() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const [name, setName] = useState('')
-  const [lang, setLang] = useState<'si' | 'ta' | 'en'>('si')
+  const [lang, setLang] = useState<Lang>(((i18n.resolvedLanguage as Lang) ?? 'si'))
+  const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
-  async function handleContinue() {
-    setSaving(true)
-    i18n.changeLanguage(lang)
+  function pick(code: Lang) {
+    setLang(code)
+    void i18n.changeLanguage(code)
+  }
 
-    if (supabase) {
-      const { data } = await supabase.auth.getUser()
-      if (data.user) {
-        await supabase
-          .from('app_users')
-          .update({ display_name: name, preferred_language: lang })
-          .eq('id', data.user.id)
-      }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const displayName = name.trim()
+    if (!displayName) return
+    setSaving(true)
+
+    if (!supabase) {
+      setDemoUser({ displayName, language: lang })
+      navigate('/')
+      return
     }
 
+    const { data } = await supabase.auth.getUser()
+    if (data.user) {
+      const { error: saveError } = await supabase
+        .from('app_users')
+        .update({ display_name: displayName, preferred_language: lang })
+        .eq('id', data.user.id)
+      if (saveError) {
+        setSaving(false)
+        setError(t('auth.errorGeneric'))
+        return
+      }
+    }
     navigate('/')
   }
 
   return (
-    <AuthLayout>
-      <Card>
-        <p className="text-[15px] font-bold mb-2.5">{t('auth.welcomeNameLabel')}</p>
-        <label className="block mb-4">
-          <input
-            className="w-full h-11 rounded-[var(--radius-ctl)] border-[1.5px] border-[var(--border)] bg-[var(--surface)] px-3 text-base outline-none focus:border-[var(--accent)]"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nadeesha"
-          />
-        </label>
+    <AuthLayout title={t('auth.welcomeTitle')} subtitle={t('auth.welcomeSubtitle')}>
+      <form onSubmit={handleSubmit}>
+        <Field
+          label={t('auth.welcomeNameLabel')}
+          placeholder={t('auth.welcomeNamePlaceholder')}
+          autoComplete="given-name"
+          autoFocus
+          maxLength={60}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          error={error}
+        />
 
-        <p className="text-[13px] font-semibold text-[var(--muted)] mb-2">{t('auth.welcomeLanguageLabel')}</p>
-        <div className="flex gap-2.5 mb-4">
-          {LANGUAGES.map((l) => (
-            <button
-              key={l.code}
-              type="button"
-              onClick={() => setLang(l.code)}
-              className={`flex-1 border-[1.5px] rounded-2xl p-3 text-center text-sm font-semibold ${
-                lang === l.code
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-ink)]'
-                  : 'border-[var(--border)] text-[var(--text)]'
-              }`}
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
+        <fieldset className="mt-2">
+          <legend className="block text-[14px] font-semibold mb-2">{t('auth.welcomeLanguageLabel')}</legend>
+          <div className="grid grid-cols-3 gap-2.5">
+            {TILES.map((tile) => {
+              const active = lang === tile.code
+              return (
+                <button
+                  key={tile.code}
+                  type="button"
+                  lang={tile.code}
+                  aria-pressed={active}
+                  onClick={() => pick(tile.code)}
+                  className={`relative rounded-2xl border-[1.5px] px-2 py-3.5 text-center transition-all active:scale-[0.97] ${
+                    active
+                      ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent-ink)]'
+                      : 'border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--ground)]'
+                  }`}
+                >
+                  {active && (
+                    <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[var(--accent)] text-white flex items-center justify-center">
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                  )}
+                  <span className="block text-[17px] font-extrabold leading-tight">{tile.native}</span>
+                  <span className="block text-[12px] font-semibold text-[var(--muted)] mt-1" lang="en">
+                    {tile.latin}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </fieldset>
 
-        <Button onClick={handleContinue} disabled={!name || saving}>
+        <Button type="submit" disabled={!name.trim() || saving} className="mt-7 group">
           {t('auth.continue')}
+          <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
         </Button>
-      </Card>
+      </form>
     </AuthLayout>
   )
 }
