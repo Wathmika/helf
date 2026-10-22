@@ -1,21 +1,29 @@
 import { QRCodeSVG } from 'qrcode.react'
+import { HelfBadge } from './Logo'
 
-/** A real, scannable QR — it opens this page's live demo, never a made-up
- * domain. The production scan domain isn't secured yet (architecture doc
- * §11), so nothing here should encode a guessed helf URL. */
-export function QrMark({ size = 140, sweep = false, className = '' }: { size?: number; sweep?: boolean; className?: string }) {
-  const value = typeof window === 'undefined' ? '#demo' : `${window.location.origin}/#demo`
+/** A real, scannable QR with the helf logo in the middle. By default it
+ * opens this page's live demo — never a made-up domain, since the
+ * production scan domain isn't secured yet (architecture doc §11). */
+export function QrMark({
+  size = 140,
+  sweep = false,
+  value,
+  fg = '#141a21',
+  className = '',
+}: {
+  size?: number
+  sweep?: boolean
+  value?: string
+  fg?: string
+  className?: string
+}) {
+  const content = value ?? (typeof window === 'undefined' ? '#demo' : `${window.location.origin}/#demo`)
   return (
     <div className={`relative inline-block bg-white rounded-xl p-2.5 overflow-hidden ${className}`}>
-      <QRCodeSVG value={value} size={size} level="M" fgColor="#141a21" bgColor="#ffffff" />
+      {/* Level Q keeps the code readable with the logo covering its middle. */}
+      <QRCodeSVG value={content} size={size} level="Q" fgColor={fg} bgColor="#ffffff" className="block" />
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        {/* ~5% of the code's area: well inside level-M error correction (15%) */}
-        <span
-          className="rounded-md bg-[var(--accent)] text-white flex items-center justify-center font-extrabold ring-[3px] ring-white"
-          style={{ width: Math.round(size * 0.2), height: Math.round(size * 0.2), fontSize: Math.round(size * 0.1) }}
-        >
-          h
-        </span>
+        <HelfBadge size={Math.round(size * 0.22)} />
       </div>
       {sweep && (
         <div

@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { Bike, Check, CreditCard, RotateCw, Smartphone } from 'lucide-react'
 import { QrMark } from '../components/QrMark'
+import { HelfBadge, HelfLockup } from '../components/Logo'
 import { SectionHead } from '../components/SectionHead'
 import { Reveal } from '../components/Reveal'
 
@@ -13,8 +15,8 @@ const WAYS: { id: Way; label: string; icon: typeof CreditCard; title: string; po
     icon: CreditCard,
     title: 'Where a wallet or ID gets checked first',
     points: [
-      'Name, key alerts and the QR on the front',
-      'A short text backup inside the QR, readable with no signal',
+      'The online QR on the front opens the full profile and texts the family',
+      'An offline QR on the back holds the basics as plain text, for no signal',
       'Lost it? Stop that one card — the others keep working',
     ],
   },
@@ -42,45 +44,90 @@ const WAYS: { id: Way; label: string; icon: typeof CreditCard; title: string; po
   },
 ]
 
+// The text the backend's build_offline_qr_text() would put inside this
+// card's offline QR (same line format and alert labels), for a sample
+// person. A real card gets it from the offline_qr_text RPC.
+const OFFLINE_SAMPLE = [
+  'EMERGENCY MEDICAL INFO',
+  'Sunil Perera, 72',
+  '!! BLOOD THINNER: Warfarin',
+  '!! DIABETIC ON INSULIN: Insulin glargine at night',
+  'Ambulance: 1990',
+  'Info dated 2026-10-20',
+].join('\n')
+
+/** A QR that scales with the card (the shared QrMark is fixed-size). */
+function CardQr({ value }: { value?: string }) {
+  const content = value ?? (typeof window === 'undefined' ? '#demo' : `${window.location.origin}/#demo`)
+  return (
+    <div className="qri relative">
+      <QRCodeSVG value={content} level="Q" fgColor="#134e4a" bgColor="#ffffff" style={{ width: '100%', height: 'auto' }} />
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <HelfBadge size="22%" />
+      </div>
+    </div>
+  )
+}
+
+/** Tag design #78 ("Mosaic — emerald sheen") from Desktop/helf/helf-tags.html,
+ * with the "Help call" logo (Dark variant) in place of the old mark. */
 function WalletCard() {
   const [flipped, setFlipped] = useState(false)
   return (
-    <div className="w-full max-w-[420px]">
+    <div className="w-full max-w-[460px]">
       <button
         type="button"
         onClick={() => setFlipped((f) => !f)}
         aria-label={flipped ? 'Show the front of the card' : 'Show the back of the card'}
-        className="flip w-full aspect-[1.586] block text-left group"
+        className="flip tag78 w-full block text-left group transition-transform duration-300 hover:-translate-y-1"
       >
         <div className={`flip-inner relative w-full h-full ${flipped ? 'is-flipped' : ''}`}>
-          <div className="flip-face absolute inset-0 rounded-[22px] bg-white border border-[var(--rule)] p-5 flex gap-4 shadow-[0_26px_50px_-28px_rgba(10,61,57,0.55)] transition-shadow group-hover:shadow-[0_30px_60px_-26px_rgba(10,61,57,0.65)]">
-            <div className="flex-1 flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-[var(--accent)] text-white text-[13px] font-extrabold flex items-center justify-center">
-                  h
-                </span>
-                <span className="text-[11px] font-extrabold text-[var(--negative)] tracking-wide">SCAN IN AN EMERGENCY</span>
-              </div>
-              <p className="text-[12px] font-semibold mt-2 leading-snug">හදිසි අවස්ථාවකදී · அவசரத்தில்</p>
-              <p className="text-[20px] font-extrabold mt-auto leading-tight">Sunil Perera</p>
-              <p className="text-[12px] text-[var(--negative)] font-bold mt-1">! Blood thinners · ! Insulin</p>
+          <div className="flip-face face front">
+            <HelfLockup className="brand" />
+            <h3 className="hl">
+              In an emergency?<em>Scan to help me</em>
+            </h3>
+            <div className="flow">
+              <span>Scan</span>→<span>See info</span>→<span>Call 1990</span>
             </div>
-            <div className="self-center">
-              <QrMark size={104} />
-            </div>
+            <span className="chip">No signal? Flip for offline QR</span>
+            <figure className="qrpanel m-0">
+              <CardQr />
+              <figcaption className="cap">
+                <b>Online</b>Full profile · alerts family
+              </figcaption>
+            </figure>
           </div>
 
-          <div className="flip-face flip-back absolute inset-0 rounded-[22px] bg-[var(--deep)] text-white p-5 flex flex-col shadow-[0_26px_50px_-28px_rgba(10,61,57,0.55)]">
-            <p className="text-[12px] font-bold text-[#9fe0d6]">If you found this person</p>
-            <ol className="mt-2 text-[13px] leading-snug flex flex-col gap-1.5 text-white/90">
-              <li>1. Call 1990 for an ambulance.</li>
-              <li>2. Point your phone camera at the front.</li>
-              <li>3. Tap the call button to reach the family.</li>
+          <div className="flip-face flip-back face back">
+            <HelfLockup className="brand" />
+            <figure className="qrpanel m-0">
+              <CardQr value={OFFLINE_SAMPLE} />
+              <figcaption className="cap">
+                <b>Offline</b>Works with no signal
+              </figcaption>
+            </figure>
+            <p className="eyebrow">If you found me</p>
+            <ol className="steps m-0 p-0 list-none">
+              <li>
+                <span>01</span>
+                <div>
+                  Call 1990<small>Free ambulance, any phone</small>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  Scan the front<small>See my medical info</small>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  Tap to call family<small>They’re texted when you scan</small>
+                </div>
+              </li>
             </ol>
-            <div className="mt-auto flex items-end justify-between">
-              <p className="text-[11px] text-white/60">No app needed · works in සිංහල, தமிழ், English</p>
-              <span className="text-[22px] font-extrabold">1990</span>
-            </div>
           </div>
         </div>
       </button>
