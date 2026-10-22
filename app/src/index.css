@@ -8,7 +8,7 @@
   mockups for the composition this is built from.
 */
 :root {
-  color-scheme: light;
+  color-scheme: only light;
 
   --ground: #faf7f2;
   --surface: #ffffff;

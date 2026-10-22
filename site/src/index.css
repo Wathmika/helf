@@ -4,7 +4,7 @@
    from the already-deployed public scan page so the promo site, the app,
    and the thing a stranger actually scans all read as one product. */
 :root {
-  color-scheme: light;
+  color-scheme: only light;
 
   --ground: #faf7f2;
   --surface: #ffffff;

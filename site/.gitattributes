@@ -1,3 +1,4 @@
-# The scan-page design is kept byte-for-byte as delivered — no line-ending
-# conversion on commit or checkout.
+# The scan-page design is kept exactly as delivered (apart from the
+# light-only lock on its <html> tag) — no line-ending conversion on
+# commit or checkout.
 public/scan.html -text
