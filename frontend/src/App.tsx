@@ -1,41 +1,70 @@
-import { Navigate, Route, Routes } from "react-router-dom"
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ConfigBanner } from './components/ConfigBanner'
+import { AppShell } from './components/AppShell'
+import { GuestOnly } from './components/GuestOnly'
+import { RequireAuth } from './components/RequireAuth'
+import { SessionProvider } from './lib/session'
+import { PhoneEntry } from './pages/auth/PhoneEntry'
+import { EmailEntry } from './pages/auth/EmailEntry'
+import { OtpEntry } from './pages/auth/OtpEntry'
+import { Welcome } from './pages/auth/Welcome'
+import { ProfilesList } from './pages/profiles/ProfilesList'
+import { NewProfile } from './pages/profiles/NewProfile'
+import { InviteEntry } from './pages/profiles/InviteEntry'
+import { Account } from './pages/account/Account'
 
-import { RequireAuth, RequireOnboarded } from "@/auth/ProtectedRoute"
-import { AppShell } from "@/components/AppShell"
-import { AccountScreen } from "@/pages/account/AccountScreen"
-import { LoginEntry } from "@/pages/auth/LoginEntry"
-import { OtpEntry } from "@/pages/auth/OtpEntry"
-import { WelcomeSetup } from "@/pages/auth/WelcomeSetup"
-import { ProfilesList } from "@/pages/dashboard/ProfilesList"
-import { LandingPage } from "@/pages/landing/LandingPage"
-import { ProfileEditor } from "@/pages/profile/ProfileEditor"
-import { QrCodesScreen } from "@/pages/qr/QrCodesScreen"
-import { InvitesScreen } from "@/pages/sharing/InvitesScreen"
-import { JoinByCodeScreen } from "@/pages/sharing/JoinByCodeScreen"
+/*
+  One website (helf.lk):
+  - /            the public home page (src/site)
+  - /login…      sign in by phone or email code
+  - /dashboard…  everything after signing in
+  The live scan page, /s/{token}, is not part of this build: it's served by
+  the backend, so the host (CloudFront) must send /s/* there.
 
-export function App() {
+  The public page and the two biggest dashboard screens load on demand, so
+  a phone on a weak connection only downloads the part it opens.
+*/
+const Home = lazy(() => import('./site/Home').then((m) => ({ default: m.Home })))
+const PersonDetail = lazy(() => import('./pages/person/PersonDetail').then((m) => ({ default: m.PersonDetail })))
+const PersonQr = lazy(() => import('./pages/person/PersonQr').then((m) => ({ default: m.PersonQr })))
+
+const queryClient = new QueryClient()
+
+export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginEntry />} />
-      <Route path="/login/verify" element={<OtpEntry />} />
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider>
+        <BrowserRouter>
+          <ConfigBanner />
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<Home />} />
 
-      <Route element={<RequireAuth />}>
-        <Route path="/welcome" element={<WelcomeSetup />} />
+              <Route element={<GuestOnly />}>
+                <Route path="/login" element={<PhoneEntry />} />
+                <Route path="/login/email" element={<EmailEntry />} />
+              </Route>
+              <Route path="/login/otp" element={<OtpEntry />} />
+              <Route path="/login/welcome" element={<Welcome />} />
 
-        <Route element={<RequireOnboarded />}>
-          <Route path="/app" element={<AppShell />}>
-            <Route index element={<ProfilesList />} />
-            <Route path="join" element={<JoinByCodeScreen />} />
-            <Route path="profiles/:personId" element={<ProfileEditor />} />
-            <Route path="profiles/:personId/qr" element={<QrCodesScreen />} />
-            <Route path="profiles/:personId/share" element={<InvitesScreen />} />
-            <Route path="account" element={<AccountScreen />} />
-          </Route>
-        </Route>
-      </Route>
+              <Route element={<RequireAuth />}>
+                <Route path="/dashboard" element={<AppShell />}>
+                  <Route index element={<ProfilesList />} />
+                  <Route path="profiles/new" element={<NewProfile />} />
+                  <Route path="invite" element={<InviteEntry />} />
+                  <Route path="person/:personId" element={<PersonDetail />} />
+                  <Route path="person/:personId/qr" element={<PersonQr />} />
+                  <Route path="account" element={<Account />} />
+                </Route>
+              </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </SessionProvider>
+    </QueryClientProvider>
   )
 }

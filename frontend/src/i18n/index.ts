@@ -1,15 +1,15 @@
-import i18next from "i18next"
-import LanguageDetector from "i18next-browser-languagedetector"
-import { initReactI18next } from "react-i18next"
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
 
-import en from "./locales/en.json"
-import si from "./locales/si.json"
-import ta from "./locales/ta.json"
+import en from './locales/en.json'
+import si from './locales/si.json'
+import ta from './locales/ta.json'
 
-export const SUPPORTED_LANGUAGES = ["si", "ta", "en"] as const
-export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
-
-void i18next
+// Sinhala/Tamil strings here are a first draft, not reviewed by a native
+// speaker yet — see docs/frontend-features.md §9 and the architecture doc's
+// open items. Flag this to a native speaker before launch.
+void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -18,17 +18,15 @@ void i18next
       ta: { translation: ta },
       en: { translation: en },
     },
-    fallbackLng: "si",
-    supportedLngs: SUPPORTED_LANGUAGES,
+    fallbackLng: 'si',
+    supportedLngs: ['si', 'ta', 'en'],
     interpolation: { escapeValue: false },
-    detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
-    },
   })
 
-i18next.on("languageChanged", (lng) => {
-  document.documentElement.lang = lng
-})
+// Keep <html lang> in step, so screen readers and font fallback pick the
+// right script.
+const syncLang = (lng: string) => document.documentElement.setAttribute('lang', lng)
+i18n.on('languageChanged', syncLang)
+if (i18n.resolvedLanguage) syncLang(i18n.resolvedLanguage)
 
-export default i18next
+export default i18n

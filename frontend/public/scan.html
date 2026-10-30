@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="color-scheme" content="only light">
+<title>Helf — Emergency Medical ID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#fdf6ec; --surface:#ffffff; --ink:#201a14; --ink-2:#6b5f51; --rule:#ece0d0;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+
+  --teal:#0d9488; --teal-ink:#ffffff; --teal-soft:#d9f5f0; --teal-deep:#0a6b63;
+  --coral:#e4472a; --coral-soft:#ffe3dc; --coral-ink:#7a1a0c;
+  --amber:#f5a524; --amber-soft:#fff2d9; --amber-ink:#7a4a04;
+  --blue:#3b6fd6; --blue-soft:#e3ecff; --blue-ink:#1c3d8f;
+  --violet:#8b5cf6; --violet-soft:#efe6ff; --violet-ink:#4c2a99;
+  --ink3:#111827;
+  --shadow: 0 1px 2px rgba(32,26,20,.06), 0 14px 30px -16px rgba(32,26,20,.25);
+  --card-border: transparent;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0b0e14; --surface:#141925; --ink:#eef1f6; --ink-2:#99a2b3; --rule:#232a38;
+    --teal-soft:#0f3733; --coral-soft:#3a1810; --amber-soft:#3a2a08; --blue-soft:#17233f; --violet-soft:#241a3d;
+    --teal-deep:#5eead4; --coral-ink:#ff9d85; --amber-ink:#ffcd7a; --blue-ink:#9db8ff; --violet-ink:#cbb2ff;
+    --card-border: var(--rule);
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 30px -16px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);line-height:1.45;-webkit-font-smoothing:antialiased}
+.sinhala{font-family:"Noto Sans Sinhala",var(--body)}
+.tamil{font-family:"Noto Sans Tamil",var(--body)}
+.touch{min-height:56px}
+button{font:inherit;cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+@keyframes soft-glow{0%,100%{box-shadow:0 0 0 0 rgba(228,71,42,.18)}50%{box-shadow:0 0 0 10px rgba(228,71,42,0)}}
+.rise{animation:rise .5s cubic-bezier(.2,.75,.2,1) both}
+@media (prefers-reduced-motion: reduce){
+  .rise{animation:none}
+  *{transition-duration:.001ms !important; animation-duration:.001ms !important}
+}
+
+.wrap{max-width:460px;margin:0 auto;padding:14px 14px 48px}
+
+/* status strip */
+.status{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--ink3);color:#fff;font:700 12.5px var(--body);letter-spacing:.015em;padding:9px 14px;border-radius:999px;text-align:center;line-height:1.3}
+.status .dot{width:7px;height:7px;border-radius:50%;background:#34d399;animation:pulse-dot 1.8s infinite ease-in-out}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 10px}
+.brand-mark{display:flex;align-items:center;gap:8px}
+.brand-mark .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,var(--teal),var(--teal-deep));display:grid;place-items:center;color:#fff;box-shadow:var(--shadow)}
+.brand-mark b{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:-.01em}
+
+.langrow{display:inline-flex;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:3px;box-shadow:var(--shadow)}
+.langrow button{border:0;background:none;color:var(--ink-2);font:700 12px var(--body);padding:7px 11px;border-radius:999px;transition:background .2s,color .2s}
+.langrow button.active{background:var(--teal);color:var(--teal-ink)}
+
+/* demo profile switcher (not part of the real QR flow — lets you preview different patient records) */
+.demorow{display:flex;align-items:center;gap:8px;justify-content:center;font-size:11px;color:var(--ink-2)}
+.demorow .label{font:800 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.demorow .pids{display:inline-flex;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:3px;box-shadow:var(--shadow)}
+.demorow .pids button{border:0;background:none;color:var(--ink-2);font:700 11px var(--body);padding:5px 10px;border-radius:999px}
+.demorow .pids button.active{background:var(--ink3);color:#fff}
+
+/* card base */
+.card{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);border:1px solid var(--card-border);padding:16px;position:relative;overflow:hidden}
+
+/* identity */
+.id-card{display:flex;align-items:center;gap:14px;background:linear-gradient(155deg,var(--teal-soft),var(--surface) 65%)}
+.id-photo{position:relative;flex-shrink:0}
+.id-photo img{width:84px;height:84px;border-radius:18px;object-fit:cover;border:3px solid var(--surface);box-shadow:var(--shadow);background:var(--rule)}
+.id-photo .verified{position:absolute;bottom:-5px;right:-5px;width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;border:2px solid var(--surface)}
+.id-info{min-width:0;flex:1}
+.id-badge{font:800 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal-deep)}
+.id-name{font-family:var(--display);font-weight:900;font-size:22px;line-height:1.08;letter-spacing:-.01em;margin:2px 0 0;color:var(--ink)}
+.id-name-native{font-weight:700;font-size:14px;color:var(--ink-2);margin-top:1px}
+.id-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.id-tags span{background:var(--surface);border:1px solid var(--rule);font:700 12px var(--body);padding:4px 9px;border-radius:8px;color:var(--ink)}
+
+/* listen */
+.listen-btn{width:100%;border:2px solid var(--teal);background:var(--surface);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);transition:transform .15s}
+.listen-btn:active{transform:scale(.98)}
+.listen-ic{width:42px;height:42px;border-radius:12px;background:var(--teal-soft);color:var(--teal-deep);display:grid;place-items:center;flex-shrink:0}
+.listen-text{text-align:left;flex:1;min-width:0}
+.listen-text b{display:block;font-size:15px;font-weight:800;color:var(--ink)}
+.listen-text span{display:block;font-size:12px;color:var(--ink-2);margin-top:1px}
+.listen-tag{font:800 10px var(--mono);letter-spacing:.08em;background:var(--teal-soft);color:var(--teal-deep);padding:5px 9px;border-radius:7px;flex-shrink:0}
+.audio-banner{display:none;margin-top:8px;padding:10px 12px;background:var(--teal-soft);border-radius:14px;font-size:12px;color:var(--teal-deep);align-items:center;justify-content:space-between;font-weight:700}
+.audio-banner.show{display:flex}
+.audio-banner .pulse{width:8px;height:8px;border-radius:50%;background:var(--teal-deep);animation:pulse-dot 1s infinite;margin-right:6px}
+.audio-banner button{background:none;border:0;color:var(--coral);font-weight:800;text-decoration:underline}
+
+/* advisory amber */
+.advisory{background:var(--amber-soft);border-radius:20px;padding:14px;display:flex;gap:11px;box-shadow:var(--shadow);border:1px solid var(--card-border)}
+.advisory .ic{width:36px;height:36px;border-radius:11px;background:var(--amber);color:#fff;display:grid;place-items:center;flex-shrink:0}
+.advisory h3{margin:0;font:800 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber-ink)}
+.advisory p{margin:3px 0 0;font-weight:800;font-size:15px;color:var(--amber-ink);line-height:1.3}
+.advisory .sub{font-weight:600;font-size:12.5px;color:var(--amber-ink);opacity:.8;margin-top:5px}
+
+/* critical */
+.crit-card{background:linear-gradient(160deg,var(--coral-soft),var(--surface) 70%);border:2px solid var(--coral)}
+.crit-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:11px;border-bottom:1px solid rgba(228,71,42,.18);margin-bottom:11px}
+.crit-head .t{display:flex;align-items:center;gap:9px}
+.crit-ic{width:30px;height:30px;border-radius:10px;background:var(--coral);color:#fff;display:grid;place-items:center}
+.crit-head h3{margin:0;font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.01em;text-transform:uppercase;color:var(--coral-ink)}
+.crit-head .flag{font:800 10px var(--mono);letter-spacing:.07em;background:var(--coral);color:#fff;padding:5px 9px;border-radius:7px;text-transform:uppercase}
+.crit-item{display:flex;gap:10px;padding:9px 0}
+.crit-item+.crit-item{border-top:1px solid rgba(228,71,42,.14)}
+.crit-item svg{flex-shrink:0;color:var(--coral);margin-top:2px}
+.crit-item b{display:block;font-size:15px;font-weight:800;color:var(--ink)}
+.crit-item span{display:block;font-size:12.5px;font-weight:600;color:var(--coral-ink);margin-top:2px}
+.crit-empty{font-size:13px;color:var(--ink-2);font-weight:600;padding:6px 0}
+
+/* call stack */
+.call-stack{display:flex;flex-direction:column;gap:10px}
+.call-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:20px;padding:13px 14px;box-shadow:var(--shadow);transition:transform .15s}
+.call-btn:active{transform:scale(.97)}
+.call-l{display:flex;align-items:center;gap:12px;min-width:0}
+.call-ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex-shrink:0}
+.call-txt{min-width:0;text-align:left}
+.call-tag{font:800 9.5px var(--mono);letter-spacing:.09em;text-transform:uppercase;padding:2px 7px;border-radius:6px;display:inline-block}
+.call-name{display:block;font-weight:900;font-size:16px;line-height:1.2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.call-sub{display:block;font-size:11.5px;font-weight:600;margin-top:2px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.call-cta{flex-shrink:0;border-radius:12px;padding:9px 13px;font:800 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+
+.call-btn.amb{background:linear-gradient(135deg,#1b2435,var(--ink3));color:#fff;animation:soft-glow 2.6s infinite}
+.call-btn.amb .call-ic{background:var(--coral);color:#fff}
+.call-btn.amb .call-tag{background:rgba(228,71,42,.25);color:#ffb6a3}
+.call-btn.amb .call-sub{color:#aab3c4}
+.call-btn.amb .call-cta{background:var(--coral);color:#fff}
+
+.call-btn.primary{background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:#fff}
+.call-btn.primary .call-ic{background:rgba(255,255,255,.22);color:#fff}
+.call-btn.primary .call-tag{background:rgba(255,255,255,.22);color:#fff}
+.call-btn.primary .call-sub{color:#d6f3ee}
+.call-btn.primary .call-cta{background:#fff;color:var(--teal-deep)}
+
+.call-btn.secondary{background:var(--surface);border:2px solid var(--rule);color:var(--ink)}
+.call-btn.secondary .call-ic{background:var(--blue-soft);color:var(--blue-ink)}
+.call-btn.secondary .call-tag{background:var(--blue-soft);color:var(--blue-ink)}
+.call-btn.secondary .call-sub{color:var(--ink-2)}
+.call-btn.secondary .call-cta{background:var(--ink3);color:#fff}
+
+/* section label */
+.section-label{font:800 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin:4px 2px 2px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+/* collapsible */
+.xcard{border-radius:20px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--card-border)}
+.xhead{width:100%;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;padding:14px;background:var(--surface);border:0;text-align:left}
+.xhead .xic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0}
+.xhead .xt b{display:block;font-size:14.5px;font-weight:800;color:var(--ink)}
+.xhead .xt span{display:block;font-size:11.5px;color:var(--ink-2);font-weight:600;margin-top:1px}
+.xcount{font:800 11px var(--mono);padding:3px 8px;border-radius:7px;flex-shrink:0}
+.xchev{width:22px;height:22px;flex-shrink:0;transition:transform .3s cubic-bezier(.2,.75,.2,1);color:var(--ink-2)}
+.xcard[open] .xchev{transform:rotate(180deg)}
+.xbody-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.2,.75,.2,1)}
+.xcard[open] .xbody-wrap{grid-template-rows:1fr}
+.xbody-inner{overflow:hidden}
+.xbody{padding:0 14px 14px;border-top:1px solid var(--rule)}
+
+.xcard.c-amber .xhead .xic{background:var(--amber-soft);color:var(--amber-ink)}
+.xcard.c-amber .xcount{background:var(--amber-soft);color:var(--amber-ink)}
+.xcard.c-blue .xhead .xic{background:var(--blue-soft);color:var(--blue-ink)}
+.xcard.c-blue .xcount{background:var(--blue-soft);color:var(--blue-ink)}
+.xcard.c-violet .xhead .xic{background:var(--violet-soft);color:var(--violet-ink)}
+.xcard.c-violet .xcount{background:var(--violet-soft);color:var(--violet-ink)}
+.xcard.c-teal .xhead .xic{background:var(--teal-soft);color:var(--teal-deep)}
+.xcard.c-teal .xcount{background:var(--teal-soft);color:var(--teal-deep)}
+
+.row-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0}
+.row-item+.row-item{border-top:1px solid var(--rule)}
+.row-item b{font-size:14px;font-weight:800;color:var(--ink);display:block}
+.row-item .rsub{font-size:12px;color:var(--ink-2);font-weight:600;margin-top:1px}
+.pill{font:800 11px var(--body);padding:4px 9px;border-radius:7px;flex-shrink:0;white-space:nowrap}
+.pill.danger{background:var(--coral-soft);color:var(--coral-ink)}
+.pill.warn{background:var(--amber-soft);color:var(--amber-ink)}
+.pill.mono{font-family:var(--mono);font-size:11px;background:var(--page);color:var(--ink-2);border:1px solid var(--rule)}
+
+.steps{list-style:none;margin:0;padding:12px 0 2px;display:flex;flex-direction:column;gap:12px}
+.steps li{display:flex;gap:11px}
+.steps .k{width:26px;height:26px;border-radius:50%;background:var(--teal-soft);color:var(--teal-deep);font:800 12px var(--mono);display:grid;place-items:center;flex-shrink:0}
+.steps b{display:block;font-size:14px;font-weight:800;color:var(--ink)}
+.steps span{display:block;font-size:12px;color:var(--ink-2);margin-top:2px}
+.steps span.danger{color:var(--coral-ink);font-weight:700}
+
+/* quiet data grid */
+.quiet-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-top:12px}
+.quiet-grid .full{grid-column:1/-1}
+.qbox{background:var(--page);border:1px solid var(--rule);border-radius:13px;padding:10px 11px}
+.qbox .ql{font:800 10px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);display:block}
+.qbox .qv{font-weight:800;font-size:15px;color:var(--ink);display:block;margin-top:3px}
+
+/* freshness + location */
+.fresh{display:flex;align-items:center;justify-content:space-between;background:var(--teal-soft);border-radius:16px;padding:11px 13px;box-shadow:var(--shadow);border:1px solid var(--card-border)}
+.fresh .l{display:flex;align-items:center;gap:8px;font:700 12px var(--body);color:var(--teal-deep)}
+.fresh .dot{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.fresh .valid{font:800 10px var(--mono);letter-spacing:.07em;background:var(--teal);color:#fff;padding:4px 8px;border-radius:7px}
+
+.loc-btn{width:100%;background:var(--surface);border:2px solid var(--ink3);border-radius:18px;padding:13px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:800;font-size:14px;color:var(--ink);box-shadow:var(--shadow);transition:transform .15s}
+.loc-btn:active{transform:scale(.98)}
+.loc-success{display:none;margin-top:8px;font-size:12px;text-align:center;color:var(--ink-2);background:var(--page);padding:9px;border-radius:12px;border:1px solid var(--rule)}
+.loc-success.show{display:block}
+
+footer{text-align:center;padding-top:6px}
+footer p{font-size:11px;line-height:1.5;color:var(--ink-2);max-width:340px;margin:0 auto}
+footer .tag{font:700 10px var(--mono);color:var(--ink-2);opacity:.7;margin-top:8px}
+
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* Dark mode: the big full-card color washes (id card, advisory, critical, freshness)
+   read as a muddy, mismatched patchwork once the page itself goes dark. Flatten those
+   cards to the same neutral surface and carry their color identity with a strong
+   border/accent-stripe instead, so color stays vivid and localized instead of smeared
+   across a whole tinted background — matches how the collapsible section headers
+   already handle color (neutral card + colored icon chip). */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .id-card{background:var(--surface);border-left:4px solid var(--teal)}
+  :root:not([data-theme="light"]) .advisory{background:var(--surface);border:2px solid var(--amber)}
+  :root:not([data-theme="light"]) .crit-card{background:var(--surface)}
+  :root:not([data-theme="light"]) .fresh{background:var(--surface);border-left:4px solid var(--teal)}
+
+  /* The secondary (outline-style) call button and its CALL pill were nearly the same
+     dark navy as the page itself — no fill, weak border — so it read as invisible/flat
+     instead of a tappable card. Give it a visibly lighter fill, a brighter border, and
+     swap its CALL pill + icon chip to higher-contrast treatments so it reads as clearly
+     as the ambulance and primary-contact buttons above it. */
+  :root:not([data-theme="light"]) .call-btn.secondary{background:#1b2130;border-color:#39435a}
+  :root:not([data-theme="light"]) .call-btn.secondary .call-ic{background:#2a3449;color:var(--blue-ink)}
+  :root:not([data-theme="light"]) .call-btn.secondary .call-cta{background:var(--ink);color:var(--ink3)}
+}
+</style>
+</head>
+<body>
+<main class="wrap stack">
+
+  <div class="status rise" style="animation-delay:.02s">
+    <span class="dot"></span>
+    <span id="t-statusbar">Official medical ID — scanned via emergency QR</span>
+  </div>
+
+  <div class="topbar rise" style="animation-delay:.05s">
+    <div class="brand-mark">
+      <span class="logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 2.5 4.5 6.5 4.5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3 4 0 6 4 4 8C19 16.65 12 21 12 21z"/></svg>
+      </span>
+      <b>helf</b>
+    </div>
+    <nav class="langrow" aria-label="Language" id="langRow">
+      <button data-lang="si" class="sinhala">සිං</button>
+      <button data-lang="ta" class="tamil">தமி</button>
+      <button data-lang="en" class="active">EN</button>
+    </nav>
+  </div>
+
+  <div class="demorow rise" style="animation-delay:.07s">
+    <span class="label" id="t-demolabel">Demo QR profile</span>
+    <span class="pids" id="pidRow"></span>
+  </div>
+
+  <!-- identity -->
+  <section class="card id-card rise" style="animation-delay:.1s">
+    <div class="id-photo">
+      <img id="f-photo" src="" alt="Patient photo">
+      <span class="verified" title="Verified">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      </span>
+    </div>
+    <div class="id-info">
+      <span class="id-badge" id="t-idbadge">PATIENT IDENTITY</span>
+      <h1 class="id-name" id="f-name">—</h1>
+      <div class="id-name-native sinhala" id="f-name-native">—</div>
+      <div class="id-tags">
+        <span id="f-age">—</span>
+        <span id="f-gender">—</span>
+        <span id="f-id">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- listen -->
+  <section class="rise" style="animation-delay:.14s">
+    <button type="button" class="listen-btn" id="btnListen">
+      <span class="listen-ic">
+        <svg id="icSpeaker" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-2.5 9.77l-4.5-4.5H3v6h4l4.5 4.5v-6zM16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+      </span>
+      <span class="listen-text">
+        <b id="t-listen-main">Listen to Page Aloud</b>
+        <span id="t-listen-sub">Tap for audio emergency summary</span>
+      </span>
+      <span class="listen-tag">AUDIO</span>
+    </button>
+    <div class="audio-banner" id="audioBanner">
+      <span><span class="pulse"></span><span id="t-audio-status">Reading aloud…</span></span>
+      <button type="button" id="btnStopAudio">Stop</button>
+    </div>
+  </section>
+
+  <!-- advisory -->
+  <section class="advisory rise" style="animation-delay:.18s" role="alert">
+    <span class="ic">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+    </span>
+    <div>
+      <h3 id="t-adv-title">Bystander Advisory</h3>
+      <p id="f-adv-desc">—</p>
+      <div class="sub sinhala" id="f-adv-sub">—</div>
+    </div>
+  </section>
+
+  <!-- critical alerts -->
+  <section class="card crit-card rise" style="animation-delay:.22s">
+    <div class="crit-head">
+      <div class="t">
+        <span class="crit-ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 012 0v4a1 1 0 11-2 0V9zm1-4a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/></svg>
+        </span>
+        <h3 id="t-crit-title">Critical Medical Alerts</h3>
+      </div>
+      <span class="flag" id="t-crit-flag">Immediate</span>
+    </div>
+    <div id="f-crit-list"></div>
+  </section>
+
+  <!-- call stack -->
+  <section class="call-stack">
+    <a href="tel:1990" class="call-btn amb touch rise" style="animation-delay:.26s">
+      <span class="call-l">
+        <span class="call-ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8h-2c0-.55-.45-1-1-1h-2V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2H4c-.55 0-1 .45-1 1v7c0 1.1.9 2 2 2h1c0 1.66 1.34 3 3 3s3-1.34 3-3h2c0 1.66 1.34 3 3 3s3-1.34 3-3h1c1.1 0 2-.9 2-2v-5c0-1.66-1.34-3-3-3z"/></svg>
+        </span>
+        <span class="call-txt">
+          <span class="call-tag" id="t-amb-tag">FREE 24/7</span>
+          <span class="call-name" id="t-amb-title">Call 1990 Ambulance</span>
+          <span class="call-sub" id="t-amb-sub">Suwa Seriya national paramedic service</span>
+        </span>
+      </span>
+      <span class="call-cta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        <span id="t-call">Call</span>
+      </span>
+    </a>
+
+    <a href="tel:" id="f-c1-link" class="call-btn primary touch rise" style="animation-delay:.30s">
+      <span class="call-l">
+        <span class="call-ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </span>
+        <span class="call-txt">
+          <span class="call-tag" id="f-c1-rel">—</span>
+          <span class="call-name" id="f-c1-name">—</span>
+          <span class="call-sub" id="f-c1-sub">—</span>
+        </span>
+      </span>
+      <span class="call-cta" id="t-call2">Call</span>
+    </a>
+
+    <a href="tel:" id="f-c2-link" class="call-btn secondary touch rise" style="animation-delay:.34s">
+      <span class="call-l">
+        <span class="call-ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </span>
+        <span class="call-txt">
+          <span class="call-tag" id="f-c2-rel">—</span>
+          <span class="call-name" id="f-c2-name">—</span>
+          <span class="call-sub" id="f-c2-sub">—</span>
+        </span>
+      </span>
+      <span class="call-cta" id="t-call3">Call</span>
+    </a>
+  </section>
+
+  <div class="section-label" id="t-label-details">Tap to expand details</div>
+
+  <!-- collapsible: steps -->
+  <details class="xcard c-teal rise" open style="animation-delay:.38s">
+    <summary class="xhead">
+      <span class="xic"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg></span>
+      <span class="xt"><b id="t-steps-title">Immediate Action Checklist</b><span id="f-steps-sub">—</span></span>
+      <span class="xcount" style="background:var(--teal-soft);color:var(--teal-deep)" id="f-steps-count">0</span>
+      <svg class="xchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody">
+      <ol class="steps" id="f-steps-list"></ol>
+    </div></div></div>
+  </details>
+
+  <!-- collapsible: allergies -->
+  <details class="xcard c-amber rise" open style="animation-delay:.42s">
+    <summary class="xhead">
+      <span class="xic"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg></span>
+      <span class="xt"><b id="t-allergy-title">Allergies</b><span id="t-allergy-sub">Known drug reactions</span></span>
+      <span class="xcount" style="background:var(--amber-soft);color:var(--amber-ink)" id="f-allergy-count">0</span>
+      <svg class="xchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody" id="f-allergy-list"></div></div></div>
+  </details>
+
+  <!-- collapsible: conditions -->
+  <details class="xcard c-blue rise" open style="animation-delay:.46s">
+    <summary class="xhead">
+      <span class="xic"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 00-1 1v6H2a1 1 0 00-1 1v2a1 1 0 001 1h6v6a1 1 0 001 1h2a1 1 0 001-1v-6h6a1 1 0 001-1v-2a1 1 0 00-1-1h-6V3a1 1 0 00-1-1H9z"/></svg></span>
+      <span class="xt"><b id="t-cond-title">Diagnosed Conditions</b><span id="t-cond-sub">Ongoing medical history</span></span>
+      <span class="xcount" style="background:var(--blue-soft);color:var(--blue-ink)" id="f-cond-count">0</span>
+      <svg class="xchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody" id="f-cond-list"></div></div></div>
+  </details>
+
+  <!-- collapsible: medications -->
+  <details class="xcard c-violet rise" open style="animation-delay:.5s">
+    <summary class="xhead">
+      <span class="xic"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm2 4h8v2H6V6zm0 4h8v2H6v-2z"/></svg></span>
+      <span class="xt"><b id="t-med-title">Current Medications</b><span id="t-med-sub">Taken daily</span></span>
+      <span class="xcount" style="background:var(--violet-soft);color:var(--violet-ink)" id="f-med-count">0</span>
+      <svg class="xchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody" id="f-med-list"></div></div></div>
+  </details>
+
+  <!-- collapsible: quiet data -->
+  <details class="xcard c-teal rise" open style="animation-delay:.54s">
+    <summary class="xhead">
+      <span class="xic"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>
+      <span class="xt"><b id="t-quiet-title">Other Reference Info</b><span id="t-quiet-sub">Blood group, language, communication</span></span>
+      <svg class="xchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody">
+      <div class="quiet-grid">
+        <div class="qbox"><span class="ql" id="t-lbl-blood">Blood Group</span><span class="qv" id="f-blood">—</span></div>
+        <div class="qbox"><span class="ql" id="t-lbl-lang">Languages</span><span class="qv" id="f-val-lang">—</span></div>
+        <div class="qbox full"><span class="ql" id="t-lbl-comm">Communication Needs</span><span class="qv" style="font-size:13px" id="f-val-comm">—</span></div>
+      </div>
+    </div></div></div>
+  </details>
+
+  <!-- freshness -->
+  <div class="fresh rise" style="animation-delay:.58s">
+    <span class="l"><span class="dot"></span><span id="f-fresh">—</span></span>
+    <span class="valid" id="t-valid">VALID</span>
+  </div>
+
+  <!-- location -->
+  <section class="rise" style="animation-delay:.62s">
+    <button type="button" class="loc-btn touch" id="btnLocation">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span id="t-loc-btn">Share My Location with Family</span>
+    </button>
+    <div class="loc-success" id="locSuccess">—</div>
+  </section>
+
+  <footer class="rise" style="animation-delay:.66s">
+    <p id="f-disclaimer">—</p>
+    <div class="tag">Sri Lanka Suwa Seriya 1990 Ready · Sinhala / Tamil / English</div>
+  </footer>
+
+</main>
+
+<script>
+/* ---------- Chrome text: patient-independent UI labels, per language ---------- */
+const uiText = {
+  en: {
+    statusbar:"Official medical ID — scanned via emergency QR",
+    demolabel:"Demo QR profile",
+    idbadge:"PATIENT IDENTITY",
+    listenMain:"Listen to Page Aloud", listenSub:"Tap for audio emergency summary",
+    audioStatus:"Reading emergency summary aloud…", audioUnsupported:"Audio not supported on this device.",
+    advTitle:"Bystander Advisory",
+    critTitle:"Critical Medical Alerts", critFlag:"Immediate", critEmpty:"No critical alerts on file.",
+    ambTag:"FREE 24/7", ambTitle:"Call 1990 Ambulance", ambSub:"Suwa Seriya national paramedic service", call:"Call",
+    labelDetails:"Tap to expand details",
+    stepsTitle:"Immediate Action Checklist", stepsSub:"{n} quick steps for bystanders",
+    allergyTitle:"Allergies", allergySub:"Known drug reactions", allergyEmpty:"No known allergies on file.",
+    condTitle:"Diagnosed Conditions", condSub:"Ongoing medical history", condEmpty:"No conditions on file.",
+    medTitle:"Current Medications", medSub:"Taken daily", medEmpty:"No regular medications on file.",
+    quietTitle:"Other Reference Info", quietSub:"Blood group, language, communication",
+    lblBlood:"Blood Group", lblLang:"Languages", lblComm:"Communication Needs",
+    valid:"VALID",
+    locBtn:"Share My Location with Family",
+    locCopied:"Location copied ({lat}, {lng}). Opening SMS to {name}…",
+    locFallback:"Opening SMS to send emergency alert to {name}…",
+    locNoGeo:"Opening SMS to {name}…",
+    disclaimer:"This emergency summary is generated for first-response triage only. Confidential medical details are published with patient and guardian consent. For hospital admissions, refer to {hospital} Card #{ref}.",
+    speechIntro:"Emergency Medical Alert for patient {name}, {age}.", speechCall:"If lost or confused, please stay with them and call {contact} immediately, or call 1990 ambulance."
+  },
+  si: {
+    statusbar:"නිල වෛද්‍ය හැඳුනුම්පත — QR මගින් ස්කෑන් කරන ලදි",
+    demolabel:"පෙළ QR පැතිකඩ",
+    idbadge:"රෝගියාගේ තොරතුරු",
+    listenMain:"හඬ මඟින් සවන් දෙන්න", listenSub:"හදිසි තොරතුරු අසන්න මෙහි තට්ටු කරන්න",
+    audioStatus:"ශ්‍රව්‍යය වාදනය වෙමින්…", audioUnsupported:"මෙම උපාංගයේ ශ්‍රව්‍ය සහාය නොමැත.",
+    advTitle:"මහජන උපදේශනය",
+    critTitle:"අතිශය වැදගත් වෛද්‍ය අනතුරු ඇඟවීම්", critFlag:"හදිසි", critEmpty:"හදිසි අනතුරු ඇඟවීම් නැත.",
+    ambTag:"නොමිලේ 24/7", ambTitle:"1990 ගිලන්රථය අමතන්න", ambSub:"සුවසැරිය රජයේ හදිසි සේවය", call:"අමතන්න",
+    labelDetails:"විස්තර බැලීමට තට්ටු කරන්න",
+    stepsTitle:"වහාම කළ යුතු පියවර", stepsSub:"පියවර {n}ක්",
+    allergyTitle:"අසාත්මිකතා", allergySub:"දන්නා ඖෂධ ප්‍රතික්‍රියා", allergyEmpty:"දන්නා අසාත්මිකතා නැත.",
+    condTitle:"පවතින රෝගී තත්වයන්", condSub:"සායනික ඉතිහාසය", condEmpty:"සටහන් කළ රෝගී තත්වයන් නැත.",
+    medTitle:"දිනපතා ගන්නා ඖෂධ", medSub:"දිනපතා", medEmpty:"නිත්‍ය ඖෂධ නැත.",
+    quietTitle:"අමතර තොරතුරු", quietSub:"රුධිර කාණ්ඩය, භාෂා, සන්නිවේදනය",
+    lblBlood:"රුධිර කාණ්ඩය", lblLang:"භාෂා", lblComm:"සන්නිවේදන අවශ්‍යතා",
+    valid:"වලංගුයි",
+    locBtn:"ස්ථානය පවුලට යවන්න",
+    locCopied:"ස්ථානය පිටපත් විය ({lat}, {lng}). {name} වෙත SMS විවෘත වෙමින්…",
+    locFallback:"{name} වෙත හදිසි SMS විවෘත වෙමින්…",
+    locNoGeo:"{name} වෙත SMS විවෘත වෙමින්…",
+    disclaimer:"මෙම තොරතුරු හදිසි ප්‍රතිකාර සඳහා පමණක් ප්‍රකාශයට පත් කර ඇත. රෝහල් ඇතුළත් කිරීම් සඳහා {hospital} කාඩ්පත අංක #{ref} බලන්න.",
+    speechIntro:"හදිසි වෛද්‍ය තොරතුරු. රෝගියා {name}, {age}.", speechCall:"අතරමංව හෝ වියවුල් නම් කරුණාකර ළඟ රැඳී {contact} අමතන්න, හෝ 1990 ගිලන්රථය අමතන්න."
+  },
+  ta: {
+    statusbar:"அதிகாரப்பூர்வ மருத்துவ அடையாளம் — QR மூலம் ஸ்கேன் செய்யப்பட்டது",
+    demolabel:"டெமோ QR சுயவிவரம்",
+    idbadge:"நோயாளி அடையாளம்",
+    listenMain:"குரல் வழியே கேட்கவும்", listenSub:"அவசரச் சுருக்கத்தைக் கேட்க தட்டவும்",
+    audioStatus:"ஒலி படிக்கப்படுகிறது…", audioUnsupported:"இந்த சாதனத்தில் ஆடியோ ஆதரிக்கப்படவில்லை.",
+    advTitle:"பொதுமக்கள் ஆலோசனை",
+    critTitle:"அவசர மருத்துவ எச்சரிக்கைகள்", critFlag:"உடனடி", critEmpty:"அவசர எச்சரிக்கைகள் இல்லை.",
+    ambTag:"இலவசம் 24/7", ambTitle:"1990 ஆம்புலன்ஸ் அழைக்கவும்", ambSub:"சுவசரிய அரச அவசர சேவை", call:"அழை",
+    labelDetails:"விவரங்களுக்கு தட்டவும்",
+    stepsTitle:"உடனடி நடவடிக்கை படிகள்", stepsSub:"{n} எளிய படிகள்",
+    allergyTitle:"ஒவ்வாமைகள்", allergySub:"அறியப்பட்ட மருந்து எதிர்வினைகள்", allergyEmpty:"அறியப்பட்ட ஒவ்வாமைகள் இல்லை.",
+    condTitle:"மருத்துவ நிலைகள்", condSub:"தொடர்ச்சியான வரலாறு", condEmpty:"பதிவு செய்யப்பட்ட நிலைகள் இல்லை.",
+    medTitle:"தினசரி மருந்துகள்", medSub:"தினமும்", medEmpty:"வழக்கமான மருந்துகள் இல்லை.",
+    quietTitle:"பிற தகவல்", quietSub:"இரத்த வகை, மொழி, தொடர்பு",
+    lblBlood:"இரத்த வகை", lblLang:"மொழிகள்", lblComm:"தொடர்பு தேவைகள்",
+    valid:"செல்லுபடியானது",
+    locBtn:"இருப்பிடத்தை பகிரவும்",
+    locCopied:"இருப்பிடம் நகலெடுக்கப்பட்டது ({lat}, {lng}). {name} க்கு SMS திறக்கிறது…",
+    locFallback:"{name} க்கு அவசர SMS திறக்கிறது…",
+    locNoGeo:"{name} க்கு SMS திறக்கிறது…",
+    disclaimer:"இந்த சுருக்கம் அவசர முதல்-பதிலளிப்புக்காக மட்டுமே. மருத்துவமனை சேர்க்கைக்கு {hospital} அட்டை #{ref} ஐப் பார்க்கவும்.",
+    speechIntro:"அவசர மருத்துவ தகவல். நோயாளி {name}, {age}.", speechCall:"தொலைந்து போனால் அருகில் இருந்து {contact} ஐ அழைக்கவும், அல்லது 1990 ஆம்புலன்ஸை அழைக்கவும்."
+  }
+};
+
+/* ---------- Patient records: swap this object (or fetch it from a backend) to drive the page ----------
+   base fields are language-independent; i18n[lang] holds everything that is read/spoken to the bystander. */
+const patients = {
+  bandara: {
+    label:"Bandara",
+    idNumber:"SL-7402", hospitalRef:"N-49120",
+    photo:"https://lh3.googleusercontent.com/aida-public/AB6AXuCycUSPhTC1-mtKQK5_70tw6b9lU5s_JUfj8MAV_oVu7adfP2rHhnIOGrRZb0GLatYr63gFJedFPW5isjgcA64BM_sOvaq3aHf0Bw6HOUgAGAw80JZBEheLIE6Q8XrQXTtncVir99Ia4Mwu6Y79mI3vNmKWkjur7ZSAmZeiSH-S2u6KlFpAdVWF1MPZhq-VcoUxjIE9nemouhvH8Ojr0A9oiZJjTaJGa3oJ7xxr0bNlPKgxtG2ct7PZ",
+    phones:{c1:"+94771234567", c2:"+94719876543"},
+    bloodGroup:"O Positive (O+)",
+    medications:[
+      {name:"Warfarin 3mg", sub:"Anticoagulant (Blood thinner)", dose:"Daily Night"},
+      {name:"Mixtard Insulin (30/70)", sub:"Subcutaneous injection", dose:"18U Morning, 14U Night"},
+      {name:"Atorvastatin 20mg", sub:"Cholesterol control", dose:"1 Tab Night"}
+    ],
+    i18n:{
+      en:{ name:"K. M. Bandara", nameNative:"කේ. එම්. බණ්ඩාර", age:"Age 68", gender:"Male",
+        advDesc:"This person may be lost, disoriented, or confused. Please stay with them.",
+        advSub:"මොහු අතරමංව හෝ වියවුල් තත්වයෙන් සිටිය හැක. කරුණාකර ඔහු ළඟ රැඳී සිටින්න.",
+        crit:[
+          {title:"Takes Blood Thinners (Warfarin)", sub:"Severe hemorrhage risk in physical trauma or head impact."},
+          {title:"Diabetic on Insulin (Hypoglycemia Risk)", sub:"If faint, sweating, or drowsy, give oral glucose if conscious."}
+        ],
+        c1:{rel:"PRIMARY · DAUGHTER", name:"Chamari Bandara", sub:"+94 77 123 4567 · Colombo"},
+        c2:{rel:"SECONDARY · SON", name:"Nuwan Bandara", sub:"+94 71 987 6543 · Kandy"},
+        steps:[
+          {title:"Keep patient calm, seated, in the shade", sub:"Do not force them to stand or walk. Keep crowds back."},
+          {title:"Call Chamari (+94 77 123 4567) or 1990", sub:"Share the patient's location and alertness level."},
+          {title:"Do not give food or pain medicine", sub:"No aspirin/Brufen — active blood thinner medication.", danger:true}
+        ],
+        allergies:[
+          {name:"Penicillin / Amoxicillin", tag:"Anaphylaxis", level:"danger"},
+          {name:"Sulfa Drugs (Sulfonamides)", tag:"Severe Rash", level:"warn"}
+        ],
+        conditions:[
+          {name:"Atrial Fibrillation (AFib)", sub:"Diagnosed 2018 · Cardiology Clinic, NHSL"},
+          {name:"Type 2 Diabetes Mellitus", sub:"Insulin dependent since 2015"},
+          {name:"Mild Cognitive Impairment", sub:"May forget phone numbers or home address"}
+        ],
+        languages:"Sinhala, English",
+        communication:"Wears reading glasses; speak calmly in Sinhala or simple English.",
+        freshness:"Updated 3 days ago · Verified"
+      },
+      si:{ name:"කේ. එම්. බණ්ඩාර", nameNative:"K. M. Bandara", age:"වයස 68", gender:"පුරුෂ",
+        advDesc:"මොහු අතරමංව හෝ සිහිමද වියවුල් තත්වයෙන් සිටිය හැක. කරුණාකර ළඟ රැඳී සිටින්න.",
+        advSub:"This person may be lost or confused, please stay with them.",
+        crit:[
+          {title:"ලේ තුනී කිරීමේ ඖෂධ (Warfarin)", sub:"තුවාල වීම්වලදී අධික රුධිර වහනය විය හැක."},
+          {title:"ඉන්සියුලින් දියවැඩියාව", sub:"ක්ලාන්තය / දහඩිය ඇත්නම් සීනි බීමක් දෙන්න."}
+        ],
+        c1:{rel:"ප්‍රධාන · දියණිය", name:"චමරි බණ්ඩාර", sub:"077 123 4567 · කොළඹ"},
+        c2:{rel:"ද්විතීයික · පුතා", name:"නුවන් බණ්ඩාර", sub:"071 987 6543 · මහනුවර"},
+        steps:[
+          {title:"රෝගියා සෙවනක සන්සුන්ව හිඳුවන්න", sub:"ඇවිදීමට බල නොකරන්න. සෙනඟ දුරස් කරන්න."},
+          {title:"චමරිට (077 123 4567) හෝ 1990ට අමතන්න", sub:"ස්ථානය සහ රෝගියාගේ තත්වය දන්වන්න."},
+          {title:"වේදනා නාශක නොදෙන්න", sub:"ලේ තුනී ඖෂධ ගන්නා බැවින් අනතුරුදායකයි.", danger:true}
+        ],
+        allergies:[
+          {name:"පෙනිසිලින් / ඇමොක්සිසිලින්", tag:"බරපතල", level:"danger"},
+          {name:"සල්ෆා ඖෂධ", tag:"සමතුවාල", level:"warn"}
+        ],
+        conditions:[
+          {name:"හෘද රිද්ම අක්‍රමිකතාව", sub:"2018 · NHSL හෘද සායනය"},
+          {name:"දෙවන කාණ්ඩයේ දියවැඩියාව", sub:"2015 සිට ඉන්සියුලින්"},
+          {name:"මතක ශක්තිය අඩුවීම", sub:"ලිපිනය අමතක විය හැක"}
+        ],
+        languages:"සිංහල, ඉංග්‍රීසි",
+        communication:"කියවීමේ කණ්ණාඩි පළඳියි; සන්සුන්ව සිංහලෙන් කතා කරන්න.",
+        freshness:"දින 3කට පෙර යාවත්කාලීන · තහවුරුයි"
+      },
+      ta:{ name:"கே. எம். பண்டார", nameNative:"K. M. Bandara", age:"வயது 68", gender:"ஆண்",
+        advDesc:"இவர் வழிதவறியவராக அல்லது குழப்ப நிலையில் இருக்கலாம். தயவுசெய்து இருங்கள்.",
+        advSub:"This person may be lost or confused, please stay with them.",
+        crit:[
+          {title:"இரத்தத்தை மெலிதாக்கும் மருந்து", sub:"காயம் ஏற்பட்டால் கடுமையான இரத்தப்போக்கு அபாயம்."},
+          {title:"இன்சுலின் நீரிழிவு நோயாளி", sub:"மயக்கம்/வியர்வை என்றால் சர்க்கரை பானம் கொடுக்கவும்."}
+        ],
+        c1:{rel:"முதன்மை · மகள்", name:"சமரி பண்டார", sub:"077 123 4567 · கொழும்பு"},
+        c2:{rel:"இரண்டாம் · மகன்", name:"நுவன் பண்டார", sub:"071 987 6543 · கண்டி"},
+        steps:[
+          {title:"நிழலில் அமைதியாக அமர வைக்கவும்", sub:"நடக்க வற்புறுத்த வேண்டாம். கூட்டத்தை விலக்கவும்."},
+          {title:"சமரிக்கு (077 123 4567) அல்லது 1990க்கு அழைக்கவும்", sub:"இடம் மற்றும் நிலையை தெரிவிக்கவும்."},
+          {title:"வலி மருந்து கொடுக்க வேண்டாம்", sub:"இரத்த மெலிக்கும் மருந்தால் ஆபத்தானது.", danger:true}
+        ],
+        allergies:[
+          {name:"பெனிசிலின் / அமோக்சிசிலின்", tag:"கடுமை", level:"danger"},
+          {name:"சல்பா மருந்துகள்", tag:"சொறி", level:"warn"}
+        ],
+        conditions:[
+          {name:"இதய துடிப்பு ஒழுங்கின்மை", sub:"2018 · NHSL இதய சிகிச்சை"},
+          {name:"வகை 2 நீரிழிவு", sub:"2015 முதல் இன்சுலின்"},
+          {name:"நினைவாற்றல் குறைபாடு", sub:"முகவரியை மறக்கலாம்"}
+        ],
+        languages:"சிங்களம், ஆங்கிலம்",
+        communication:"கண்ணாடி அணிபவர்; அமைதியாக பேசவும்.",
+        freshness:"3 நாட்களுக்கு முன் புதுப்பிக்கப்பட்டது · சரிபார்க்கப்பட்டது"
+      }
+    }
+  },
+
+  silva: {
+    label:"Silva",
+    idNumber:"SL-5110", hospitalRef:"N-33871",
+    photo:"https://lh3.googleusercontent.com/aida-public/AB6AXuCycUSPhTC1-mtKQK5_70tw6b9lU5s_JUfj8MAV_oVu7adfP2rHhnIOGrRZb0GLatYr63gFJedFPW5isjgcA64BM_sOvaq3aHf0Bw6HOUgAGAw80JZBEheLIE6Q8XrQXTtncVir99Ia4Mwu6Y79mI3vNmKWkjur7ZSAmZeiSH-S2u6KlFpAdVWF1MPZhq-VcoUxjIE9nemouhvH8Ojr0A9oiZJjTaJGa3oJ7xxr0bNlPKgxtG2ct7PZ",
+    phones:{c1:"+94773456789", c2:"+94775551212"},
+    bloodGroup:"A Positive (A+)",
+    medications:[
+      {name:"Metformin 500mg", sub:"Blood sugar control", dose:"2x Daily, with meals"},
+      {name:"Losartan 50mg", sub:"Blood pressure control", dose:"1 Tab Morning"}
+    ],
+    i18n:{
+      en:{ name:"W. A. Silva", nameNative:"ඩබ්. ඒ. සිල්වා", age:"Age 74", gender:"Female",
+        advDesc:"This person has severe hearing loss. Please face her and speak clearly, or write notes.",
+        advSub:"මෙම තැනැත්තියට ශ්‍රවණ ආබාධයක් ඇත. කරුණාකර මුහුණට මුහුණ කතා කරන්න.",
+        crit:[
+          {title:"Severe Penicillin Allergy (Anaphylaxis)", sub:"Do not administer any penicillin-family antibiotic."}
+        ],
+        c1:{rel:"PRIMARY · HUSBAND", name:"D. S. Silva", sub:"+94 77 345 6789 · Galle"},
+        c2:{rel:"SECONDARY · NEIGHBOUR", name:"Priya Fernando", sub:"+94 77 555 1212 · Galle"},
+        steps:[
+          {title:"Face her directly and speak clearly", sub:"She is hard of hearing; written notes also work well."},
+          {title:"Call her husband D. S. Silva or 1990", sub:"Share her current location and condition."}
+        ],
+        allergies:[
+          {name:"Penicillin (all forms)", tag:"Anaphylaxis", level:"danger"}
+        ],
+        conditions:[
+          {name:"Hypertension", sub:"Diagnosed 2016 · managed with daily medication"},
+          {name:"Age-related Hearing Loss", sub:"Does not use a hearing aid"}
+        ],
+        languages:"Sinhala only",
+        communication:"Hard of hearing — face her directly, speak clearly, or write short notes.",
+        freshness:"Updated 11 days ago · Verified"
+      },
+      si:{ name:"ඩබ්. ඒ. සිල්වා", nameNative:"W. A. Silva", age:"වයස 74", gender:"ස්ත්‍රී",
+        advDesc:"මෙම තැනැත්තියට දැඩි ශ්‍රවණ ආබාධයක් ඇත. කරුණාකර මුහුණට මුහුණ පැහැදිලිව කතා කරන්න.",
+        advSub:"This person has severe hearing loss, please face her and speak clearly.",
+        crit:[
+          {title:"පෙනිසිලින් වලට දැඩි අසාත්මිකතාව", sub:"පෙනිසිලින් වර්ගයේ ප්‍රතිජීවක නොදෙන්න."}
+        ],
+        c1:{rel:"ප්‍රධාන · සැමියා", name:"ඩී. එස්. සිල්වා", sub:"077 345 6789 · ගාල්ල"},
+        c2:{rel:"ද්විතීයික · අසල්වැසියා", name:"ප්‍රියා ප්‍රනාන්දු", sub:"077 555 1212 · ගාල්ල"},
+        steps:[
+          {title:"මුහුණට මුහුණ පැහැදිලිව කතා කරන්න", sub:"ඇය ශ්‍රවණ දුර්වලතාවයෙන් පෙළේ; ලිඛිත සටහන් ද හොඳයි."},
+          {title:"සැමියා ඩී. එස්. සිල්වා හෝ 1990ට අමතන්න", sub:"ස්ථානය සහ තත්වය දන්වන්න."}
+        ],
+        allergies:[
+          {name:"පෙනිසිලින් (සියලු වර්ග)", tag:"බරපතල", level:"danger"}
+        ],
+        conditions:[
+          {name:"අධි රුධිර පීඩනය", sub:"2016 · දිනපතා ඖෂධ මගින් පාලනය"},
+          {name:"වයස් ශ්‍රවණ හානිය", sub:"ශ්‍රවණ උපකරණයක් භාවිත නොකරයි"}
+        ],
+        languages:"සිංහල පමණි",
+        communication:"ශ්‍රවණ දුර්වලතාව — මුහුණට මුහුණ පැහැදිලිව කතා කරන්න, හෝ කෙටි සටහන් ලියන්න.",
+        freshness:"දින 11කට පෙර යාවත්කාලීන · තහවුරුයි"
+      },
+      ta:{ name:"டபிள்யூ. ஏ. சில்வா", nameNative:"W. A. Silva", age:"வயது 74", gender:"பெண்",
+        advDesc:"இவருக்கு கடுமையான செவித்திறன் குறைபாடு உள்ளது. நேருக்கு நேர் தெளிவாக பேசவும்.",
+        advSub:"This person has severe hearing loss, please face her and speak clearly.",
+        crit:[
+          {title:"பெனிசிலின் கடுமையான ஒவ்வாமை", sub:"பெனிசிலின் வகை மருந்துகளை கொடுக்க வேண்டாம்."}
+        ],
+        c1:{rel:"முதன்மை · கணவர்", name:"டி. எஸ். சில்வா", sub:"077 345 6789 · காலி"},
+        c2:{rel:"இரண்டாம் · அண்டை வீட்டார்", name:"பிரியா பெர்னாண்டோ", sub:"077 555 1212 · காலி"},
+        steps:[
+          {title:"நேருக்கு நேர் தெளிவாக பேசவும்", sub:"செவித்திறன் குறைவு; குறிப்புகள் எழுதுவதும் உதவும்."},
+          {title:"கணவர் டி. எஸ். சில்வா அல்லது 1990ஐ அழைக்கவும்", sub:"இடம் மற்றும் நிலையை தெரிவிக்கவும்."}
+        ],
+        allergies:[
+          {name:"பெனிசிலின் (அனைத்து வகைகளும்)", tag:"கடுமை", level:"danger"}
+        ],
+        conditions:[
+          {name:"உயர் இரத்த அழுத்தம்", sub:"2016 · தினசரி மருந்து மூலம் கட்டுப்பாடு"},
+          {name:"வயது தொடர்பான செவித்திறன் இழப்பு", sub:"செவிக்கருவி பயன்படுத்தவில்லை"}
+        ],
+        languages:"சிங்களம் மட்டும்",
+        communication:"செவித்திறன் குறைவு — நேருக்கு நேர் தெளிவாக பேசவும் அல்லது குறிப்புகள் எழுதவும்.",
+        freshness:"11 நாட்களுக்கு முன் புதுப்பிக்கப்பட்டது · சரிபார்க்கப்பட்டது"
+      }
+    }
+  }
+};
+
+/* ---------- state ---------- */
+let currentLang = 'en';
+let currentPid = 'bandara';
+let isSpeaking = false;
+
+function fmt(str, vars){
+  return str.replace(/\{(\w+)\}/g, (_, k)=> (vars && vars[k] !== undefined) ? vars[k] : '');
+}
+
+const ICON_WARN = '<svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>';
+
+function setText(id, text){ const el = document.getElementById(id); if(el) el.textContent = text; }
+
+function renderCritList(items){
+  const host = document.getElementById('f-crit-list');
+  if(!items.length){ host.innerHTML = `<div class="crit-empty">${uiText[currentLang].critEmpty}</div>`; return; }
+  host.innerHTML = items.map(it => `
+    <div class="crit-item">${ICON_WARN}<div><b>${it.title}</b><span>${it.sub}</span></div></div>
+  `).join('');
+}
+
+function renderSteps(items){
+  const host = document.getElementById('f-steps-list');
+  host.innerHTML = items.map((s,i) => `
+    <li><span class="k">${i+1}</span><div><b>${s.title}</b><span${s.danger ? ' class="danger"' : ''}>${s.sub}</span></div></li>
+  `).join('');
+  document.getElementById('f-steps-count').textContent = items.length;
+  setText('f-steps-sub', fmt(uiText[currentLang].stepsSub, {n: items.length}));
+}
+
+function renderAllergies(items){
+  const host = document.getElementById('f-allergy-list');
+  document.getElementById('f-allergy-count').textContent = items.length;
+  if(!items.length){ host.innerHTML = `<div class="crit-empty">${uiText[currentLang].allergyEmpty}</div>`; return; }
+  host.innerHTML = items.map(a => `
+    <div class="row-item"><div><b>${a.name}</b></div><span class="pill ${a.level}">${a.tag}</span></div>
+  `).join('');
+}
+
+function renderConditions(items){
+  const host = document.getElementById('f-cond-list');
+  document.getElementById('f-cond-count').textContent = items.length;
+  if(!items.length){ host.innerHTML = `<div class="crit-empty">${uiText[currentLang].condEmpty}</div>`; return; }
+  host.innerHTML = items.map(c => `
+    <div class="row-item"><div><b>${c.name}</b><span class="rsub">${c.sub}</span></div></div>
+  `).join('');
+}
+
+function renderMeds(items){
+  const host = document.getElementById('f-med-list');
+  document.getElementById('f-med-count').textContent = items.length;
+  if(!items.length){ host.innerHTML = `<div class="crit-empty">${uiText[currentLang].medEmpty}</div>`; return; }
+  host.innerHTML = items.map(m => `
+    <div class="row-item"><div><b>${m.name}</b><span class="rsub">${m.sub}</span></div><span class="pill mono">${m.dose}</span></div>
+  `).join('');
+}
+
+function render(){
+  const t = uiText[currentLang];
+  const patient = patients[currentPid];
+  const p = patient.i18n[currentLang];
+
+  document.querySelectorAll('.langrow button').forEach(b=>b.classList.toggle('active', b.dataset.lang === currentLang));
+  document.querySelectorAll('#pidRow button').forEach(b=>b.classList.toggle('active', b.dataset.pid === currentPid));
+
+  // chrome labels
+  ['statusbar','demolabel','idbadge','listenMain','listenSub','advTitle','critTitle','critFlag',
+   'ambTag','ambTitle','ambSub','labelDetails','stepsTitle','allergyTitle','allergySub',
+   'condTitle','condSub','medTitle','medSub','quietTitle','quietSub','lblBlood','lblLang','lblComm',
+   'valid','locBtn'].forEach(key=>{
+    const el = document.getElementById('t-' + key.replace(/[A-Z]/g, m=>'-'+m.toLowerCase()));
+    if(el) el.textContent = t[key];
+  });
+  setText('t-call', t.call); setText('t-call2', t.call); setText('t-call3', t.call);
+
+  // identity
+  document.getElementById('f-photo').src = patient.photo;
+  setText('f-name', p.name);
+  setText('f-name-native', p.nameNative);
+  setText('f-age', p.age);
+  setText('f-gender', p.gender);
+  setText('f-id', 'ID ' + patient.idNumber);
+
+  // advisory
+  setText('f-adv-desc', p.advDesc);
+  setText('f-adv-sub', p.advSub);
+
+  // critical alerts
+  renderCritList(p.crit);
+
+  // contacts
+  document.getElementById('f-c1-link').href = 'tel:' + patient.phones.c1;
+  setText('f-c1-rel', p.c1.rel); setText('f-c1-name', p.c1.name); setText('f-c1-sub', p.c1.sub);
+  document.getElementById('f-c2-link').href = 'tel:' + patient.phones.c2;
+  setText('f-c2-rel', p.c2.rel); setText('f-c2-name', p.c2.name); setText('f-c2-sub', p.c2.sub);
+
+  // collapsibles
+  renderSteps(p.steps);
+  renderAllergies(p.allergies);
+  renderConditions(p.conditions);
+  renderMeds(patient.medications);
+
+  // quiet data
+  setText('f-blood', patient.bloodGroup);
+  setText('f-val-lang', p.languages);
+  setText('f-val-comm', p.communication);
+
+  // freshness + footer
+  setText('f-fresh', p.freshness);
+  setText('f-disclaimer', fmt(t.disclaimer, {hospital:'NHSL', ref: patient.hospitalRef}));
+}
+
+function buildPidRow(){
+  const row = document.getElementById('pidRow');
+  row.innerHTML = Object.keys(patients).map(pid =>
+    `<button type="button" data-pid="${pid}">${patients[pid].label}</button>`
+  ).join('');
+  row.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ currentPid = btn.dataset.pid; render(); });
+  });
+}
+
+document.querySelectorAll('.langrow button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ currentLang = btn.dataset.lang; render(); });
+});
+
+/* ---------- listen aloud ---------- */
+const btnListen = document.getElementById('btnListen');
+const audioBanner = document.getElementById('audioBanner');
+const audioStatus = document.getElementById('t-audio-status');
+
+function stopAudio(){
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  isSpeaking = false;
+  audioBanner.classList.remove('show');
+}
+
+btnListen.addEventListener('click', ()=>{
+  const t = uiText[currentLang];
+  if(!('speechSynthesis' in window)){
+    audioStatus.textContent = t.audioUnsupported;
+    audioBanner.classList.add('show');
+    return;
+  }
+  if(isSpeaking){ stopAudio(); return; }
+  const patient = patients[currentPid];
+  const p = patient.i18n[currentLang];
+  const critLine = p.crit.map(c=>c.title).join('. ');
+  const speech = fmt(t.speechIntro, {name:p.name, age:p.age}) + ' ' + critLine + '. ' + fmt(t.speechCall, {contact:p.c1.name});
+  const u = new SpeechSynthesisUtterance(speech);
+  u.rate = 0.92;
+  u.onend = stopAudio;
+  u.onerror = stopAudio;
+  window.speechSynthesis.speak(u);
+  isSpeaking = true;
+  audioStatus.textContent = t.audioStatus;
+  audioBanner.classList.add('show');
+});
+document.getElementById('btnStopAudio').addEventListener('click', stopAudio);
+
+/* ---------- share location ---------- */
+document.getElementById('btnLocation').addEventListener('click', ()=>{
+  const t = uiText[currentLang];
+  const patient = patients[currentPid];
+  const p = patient.i18n[currentLang];
+  const success = document.getElementById('locSuccess');
+  const phone = patient.phones.c1;
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        const lat = pos.coords.latitude.toFixed(5);
+        const lng = pos.coords.longitude.toFixed(5);
+        const url = `https://maps.google.com/?q=${lat},${lng}`;
+        const msg = `Emergency: Located with ${p.name} at ${url}`;
+        if(navigator.clipboard) navigator.clipboard.writeText(msg).catch(()=>{});
+        success.textContent = fmt(t.locCopied, {lat, lng, name: p.c1.name});
+        success.classList.add('show');
+        window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+      },
+      ()=>{
+        success.textContent = fmt(t.locFallback, {name: p.c1.name});
+        success.classList.add('show');
+        window.location.href = `sms:${phone}?body=${encodeURIComponent('Emergency with ' + p.name + '. Please contact me.')}`;
+      }
+    );
+  } else {
+    success.textContent = fmt(t.locNoGeo, {name: p.c1.name});
+    success.classList.add('show');
+    window.location.href = `sms:${phone}?body=${encodeURIComponent('Emergency with ' + p.name + '.')}`;
+  }
+});
+
+/* ---------- boot: ?pid= selects a patient, ?lang= preselects a language (both optional) ---------- */
+(function boot(){
+  const params = new URLSearchParams(location.search);
+  const pid = params.get('pid');
+  const lang = params.get('lang');
+  if(pid && patients[pid]) currentPid = pid;
+  if(lang && uiText[lang]) currentLang = lang;
+  buildPidRow();
+  render();
+})();
+</script>
+</body>
+</html>
