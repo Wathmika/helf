@@ -24,3 +24,7 @@ __pycache__/
 .pytest_cache/
 backend/.aws-sam/
 backend/samconfig.toml
+
+# Local tool config and caches — personal to each developer's machine, never shared
+.claude/settings.local.json
+.npm-cache-tmp/
