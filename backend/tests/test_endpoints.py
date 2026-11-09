@@ -42,9 +42,9 @@ def test_scan_page_security_headers_and_nonce(client):
 
 def test_scan_page_in_sinhala_and_tamil(client):
     si = client.get(f"/s/{SUNIL_TOKEN}?lang=si").text
-    assert '<html lang="si">' in si and "1990 ගිලන් රථයට අමතන්න" in si and "පුතා" in si
+    assert '<html lang="si" data-theme="light">' in si and "1990 ගිලන් රථයට අමතන්න" in si and "පුතා" in si
     ta = client.get(f"/s/{SUNIL_TOKEN}", headers={"accept-language": "ta-LK"}).text
-    assert '<html lang="ta">' in ta and "முக்கிய எச்சரிக்கைகள்" in ta
+    assert '<html lang="ta" data-theme="light">' in ta and "முக்கிய எச்சரிக்கைகள்" in ta
 
 
 def test_language_switch_reuses_the_scan(client, fake):

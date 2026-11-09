@@ -1,589 +1,277 @@
 <!doctype html>
-<html lang="{{ lang }}">
+<html lang="{{ lang }}" data-theme="light">
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="only light">
   <title>{{ t('title') }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
   <style nonce="{{ nonce }}">
-    :root {
-      --page: #fdf6ec;
-      --card: #ffffff;
-      --ink: #1f2430;
-      --muted: #6b7280;
-      --line: #ece4d6;
-      --teal: #0f766e;
-      --teal-soft: #e4f3f1;
-      --teal-ink: #0b5a54;
-      --teal-deep: #0a4a45;
-      --coral: #c62828;
-      --coral-soft: #fdeceb;
-      --coral-ink: #a01f1f;
-      --coral-deep: #7f1818;
-      --amber: #b45309;
-      --amber-soft: #fef3e2;
-      --amber-ink: #92400a;
-      --blue: #2563eb;
-      --blue-soft: #eaf1fd;
-      --violet: #7c3aed;
-      --violet-soft: #f1eafd;
-      --radius: 16px;
-      font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Sinhala", "Noto Sans Tamil", "Noto Sans", sans-serif;
-    }
+    :root{
+      --page:#fdf6ec; --surface:#ffffff; --ink:#201a14; --ink-2:#6b5f51; --rule:#ece0d0;
+      --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+      --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
 
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --page: #15171c;
-        --card: #1d2027;
-        --ink: #eef0f3;
-        --muted: #9aa1ad;
-        --line: #2b2f38;
-        --teal-soft: #113430;
-        --teal-ink: #5fd1c4;
-        --coral-soft: #3a1616;
-        --coral-ink: #ff9b96;
-        --amber-soft: #3a2a10;
-        --amber-ink: #ffc266;
-        --blue-soft: #15233f;
-        --violet-soft: #241a3a;
+      --teal:#0d9488; --teal-ink:#ffffff; --teal-soft:#d9f5f0; --teal-deep:#0a6b63;
+      --coral:#e4472a; --coral-soft:#ffe3dc; --coral-ink:#7a1a0c;
+      --amber:#f5a524; --amber-soft:#fff2d9; --amber-ink:#7a4a04;
+      --blue:#3b6fd6; --blue-soft:#e3ecff; --blue-ink:#1c3d8f;
+      --violet:#8b5cf6; --violet-soft:#efe6ff; --violet-ink:#4c2a99;
+      --ink3:#111827;
+      --shadow: 0 1px 2px rgba(32,26,20,.06), 0 14px 30px -16px rgba(32,26,20,.25);
+      --card-border: transparent;
+    }
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]){
+        --page:#0b0e14; --surface:#141925; --ink:#eef1f6; --ink-2:#99a2b3; --rule:#232a38;
+        --teal-soft:#0f3733; --coral-soft:#3a1810; --amber-soft:#3a2a08; --blue-soft:#17233f; --violet-soft:#241a3d;
+        --teal-deep:#5eead4; --coral-ink:#ff9d85; --amber-ink:#ffcd7a; --blue-ink:#9db8ff; --violet-ink:#cbb2ff;
+        --card-border: var(--rule);
+        --shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 30px -16px rgba(0,0,0,.55);
+        color-scheme: dark;
       }
     }
 
-    :root[data-theme="dark"] {
-      --page: #15171c;
-      --card: #1d2027;
-      --ink: #eef0f3;
-      --muted: #9aa1ad;
-      --line: #2b2f38;
-      --teal-soft: #113430;
-      --teal-ink: #5fd1c4;
-      --coral-soft: #3a1616;
-      --coral-ink: #ff9b96;
-      --amber-soft: #3a2a10;
-      --amber-ink: #ffc266;
-      --blue-soft: #15233f;
-      --violet-soft: #241a3a;
-    }
-
-    * {
-      box-sizing: border-box
-    }
-
-    body {
-      margin: 0;
-      background: var(--page);
-      color: var(--ink);
-      font-size: 17px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased
-    }
-
-    main {
-      max-width: 560px;
-      margin: 0 auto;
-      padding: 14px 16px 40px
-    }
-
-    h1,
-    h2,
-    h3 {
-      font-family: "Archivo", system-ui, sans-serif;
-      margin: 0
-    }
-
-    code,
-    .mono {
-      font-family: "JetBrains Mono", ui-monospace, Menlo, monospace
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .rise {
-        opacity: 0;
-        transform: translateY(8px);
-        animation: rise .5s ease forwards
-      }
-    }
-
-    @keyframes rise {
-      to {
-        opacity: 1;
-        transform: none
-      }
-    }
-
-    .statusbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px
-    }
-
-    .idbadge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--coral);
-      color: #fff;
-      font-weight: 800;
-      padding: 5px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      letter-spacing: .04em;
-      text-transform: uppercase
-    }
-
-    .langrow {
-      display: flex;
-      gap: 4px
-    }
-
-    .langrow a {
-      min-height: 40px;
-      min-width: 40px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 10px;
-      border: 2px solid var(--teal);
-      border-radius: 10px;
-      color: var(--teal);
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-      background: var(--card)
-    }
-
-    .langrow a[aria-current="true"] {
-      background: var(--teal);
-      color: #fff
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 6px 0 14px
-    }
-
-    .topbar h1 {
-      font-size: 19px
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin: 12px 0;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .03)
-    }
-
-    .id-card {
-      display: flex;
-      gap: 14px;
-      align-items: center
-    }
-
-    .id-card img {
-      width: 88px;
-      height: 88px;
-      border-radius: 14px;
-      object-fit: cover;
-      flex: none;
-      border: 1px solid var(--line)
-    }
-
-    .id-name {
-      font-size: 24px;
-      font-weight: 800;
-      margin: 0;
-      line-height: 1.15
-    }
-
-    .id-age {
-      color: var(--muted);
-      margin: 2px 0 0;
-      font-size: 15px
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin: 12px 0
-    }
-
-    .btn-listen {
-      flex: 1;
-      min-height: 50px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: 2px solid var(--teal);
-      border-radius: 12px;
-      color: var(--teal);
-      background: var(--card);
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer
-    }
-
-    .btn-listen.speaking {
-      background: var(--teal);
-      color: #fff
-    }
-
-    .status-note {
-      font-size: 14px;
-      color: var(--muted);
-      margin: 6px 2px 0
-    }
-
-    .banner {
-      border: 2px solid var(--amber);
-      background: var(--amber-soft);
-      color: var(--amber-ink)
-    }
-
-    .banner strong {
-      display: block;
-      margin-bottom: 2px
-    }
-
-    .crit-card {
-      border: 2px solid var(--coral)
-    }
-
-    .crit-card h2 {
-      color: var(--coral-ink);
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    .crit-item {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 9px 0;
-      border-top: 1px solid var(--line)
-    }
-
-    .crit-item:first-of-type {
-      border-top: 0
-    }
-
-    .crit-item svg {
-      flex: none;
-      margin-top: 2px;
-      color: var(--coral)
-    }
-
-    .crit-item b {
-      display: block;
-      font-size: 15.5px
-    }
-
-    .crit-item span.note {
-      display: block;
-      font-weight: 400;
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 1px
-    }
-
-    .call-stack a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 54px;
-      border-radius: 12px;
-      margin: 8px 0;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 17px;
-      text-align: center;
-      padding: 8px 14px
-    }
-
-    .call-sos {
-      background: var(--ink);
-      color: var(--page)
-    }
-
-    .call-contact {
-      background: var(--teal);
-      color: #fff
-    }
-
-    .steps ol {
-      margin: 0;
-      padding-left: 0;
-      list-style: none;
-      counter-reset: step
-    }
-
-    .steps li {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 7px 0;
-      counter-increment: step
-    }
-
-    .steps li::before {
-      content: counter(step);
-      flex: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--teal-soft);
-      color: var(--teal-ink);
-      font-weight: 800;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 1px
-    }
-
-    details.xcard {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--card);
-      margin: 12px 0;
-      overflow: hidden
-    }
-
-    details.xcard summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: 700;
-      font-size: 15.5px
-    }
-
-    details.xcard summary::-webkit-details-marker {
-      display: none
-    }
-
-    details.xcard summary .chev {
-      transition: transform .2s ease;
-      color: var(--muted)
-    }
-
-    details.xcard[open] summary .chev {
-      transform: rotate(180deg)
-    }
-
-    details.xcard .xbody {
-      padding: 0 16px 14px
-    }
-
-    .count-pill {
-      background: var(--line);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 2px 9px;
-      font-size: 12.5px;
-      font-weight: 700;
-      margin-left: 8px
-    }
-
-    .row-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 0;
-      border-top: 1px solid var(--line)
-    }
-
-    .row-item:first-child {
-      border-top: 0
-    }
-
-    .row-item b {
-      font-size: 15px
-    }
-
-    .row-item .rsub,
-    .row-item span.note {
-      display: block;
-      color: var(--muted);
-      font-size: 13.5px;
-      font-weight: 400
-    }
-
-    .pill {
-      border-radius: 999px;
-      padding: 3px 10px;
-      font-size: 12.5px;
-      font-weight: 700;
-      flex: none
-    }
-
-    .pill.danger {
-      background: var(--coral-soft);
-      color: var(--coral-ink)
-    }
-
-    .facts dl {
-      margin: 0
-    }
-
-    .facts dt {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 10px
-    }
-
-    .facts dt:first-child {
-      margin-top: 0
-    }
-
-    .facts dd {
-      margin: 2px 0 0;
-      font-size: 15.5px
-    }
-
-    .fresh {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-weight: 700;
-      font-size: 14.5px
-    }
-
-    .fresh.ok {
-      color: var(--teal-ink)
-    }
-
-    .fresh.old {
-      color: var(--amber-ink)
-    }
-
-    .share {
-      width: 100%;
-      min-height: 50px;
-      border: 2px solid var(--teal);
-      background: var(--card);
-      color: var(--teal);
-      font: inherit;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-top: 10px
-    }
-
-    .message-card {
-      text-align: center;
-      padding: 28px 16px
-    }
-
-    .message {
-      font-size: 19px;
-      font-weight: 700;
-      margin: 0 0 6px
-    }
-
-    .message-sub {
-      color: var(--muted);
-      margin: 0
-    }
-
-    footer {
-      color: var(--muted);
-      font-size: 13.5px;
-      margin-top: 22px;
-      text-align: center
-    }
-
-    [hidden] {
-      display: none !important
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);line-height:1.45;-webkit-font-smoothing:antialiased}
+    .touch{min-height:56px}
+    button{font:inherit;cursor:pointer}
+    a{text-decoration:none;color:inherit}
+
+    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+    @keyframes soft-glow{0%,100%{box-shadow:0 0 0 0 rgba(228,71,42,.18)}50%{box-shadow:0 0 0 10px rgba(228,71,42,0)}}
+    .rise{animation:rise .5s cubic-bezier(.2,.75,.2,1) both}
+    @media (prefers-reduced-motion: reduce){
+      .rise{animation:none}
+      *{transition-duration:.001ms !important; animation-duration:.001ms !important}
+    }
+
+    main.wrap{max-width:460px;margin:0 auto;padding:14px 14px 48px}
+    .stack{display:flex;flex-direction:column;gap:12px}
+
+    /* top bar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+    .idbadge{display:inline-flex;align-items:center;gap:6px;background:var(--coral);color:#fff;font:800 11px var(--body);letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:999px;box-shadow:var(--shadow)}
+    .langrow{display:inline-flex;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:3px;box-shadow:var(--shadow)}
+    .langrow a{display:inline-flex;align-items:center;justify-content:center;min-height:32px;border:0;background:none;color:var(--ink-2);font:700 12px var(--body);padding:7px 11px;border-radius:999px;transition:background .2s,color .2s}
+    .langrow a[aria-current="true"]{background:var(--teal);color:var(--teal-ink)}
+    h1.page-title{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-.01em;margin:10px 2px 2px;color:var(--ink)}
+
+    /* card base */
+    .card{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);border:1px solid var(--card-border);padding:16px;position:relative;overflow:hidden}
+
+    /* identity */
+    .id-card{display:flex;align-items:center;gap:14px;background:linear-gradient(155deg,var(--teal-soft),var(--surface) 65%)}
+    .id-card img{width:84px;height:84px;border-radius:18px;object-fit:cover;border:3px solid var(--surface);box-shadow:var(--shadow);background:var(--rule);flex-shrink:0}
+    .id-info{min-width:0;flex:1}
+    .id-name{font-family:var(--display);font-weight:900;font-size:22px;line-height:1.1;letter-spacing:-.01em;margin:0;color:var(--ink)}
+    .id-age{font:700 13px var(--body);color:var(--ink-2);margin-top:5px;display:inline-block;background:var(--surface);border:1px solid var(--rule);padding:4px 9px;border-radius:8px}
+
+    /* listen */
+    .listen-btn{width:100%;border:2px solid var(--teal);background:var(--surface);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);transition:transform .15s,background .2s,color .2s}
+    .listen-btn:active{transform:scale(.98)}
+    .listen-btn .listen-ic{width:42px;height:42px;border-radius:12px;background:var(--teal-soft);color:var(--teal-deep);display:grid;place-items:center;flex-shrink:0;transition:background .2s,color .2s}
+    .listen-btn .listen-text{text-align:left;flex:1;min-width:0;font-weight:800;font-size:15px;color:var(--ink)}
+    .listen-btn.speaking{background:var(--teal);border-color:var(--teal)}
+    .listen-btn.speaking .listen-text{color:#fff}
+    .listen-btn.speaking .listen-ic{background:rgba(255,255,255,.22);color:#fff}
+    .status-note{font-size:13px;color:var(--ink-2);margin:8px 2px 0;font-weight:600}
+
+    /* advisory amber (lost-person banner) */
+    .advisory{background:var(--amber-soft);border-radius:20px;padding:14px;display:flex;gap:11px;box-shadow:var(--shadow);border:1px solid var(--card-border)}
+    .advisory .ic{width:36px;height:36px;border-radius:11px;background:var(--amber);color:#fff;display:grid;place-items:center;flex-shrink:0}
+    .advisory p{margin:0;font-weight:800;font-size:15px;color:var(--amber-ink);line-height:1.3}
+    .advisory .sub{font-weight:600;font-size:12.5px;color:var(--amber-ink);opacity:.85;margin-top:5px}
+
+    /* critical alerts */
+    .crit-card{background:linear-gradient(160deg,var(--coral-soft),var(--surface) 70%);border:2px solid var(--coral)}
+    .crit-head{display:flex;align-items:center;gap:9px;padding-bottom:11px;border-bottom:1px solid rgba(228,71,42,.18);margin-bottom:11px}
+    .crit-ic{width:30px;height:30px;border-radius:10px;background:var(--coral);color:#fff;display:grid;place-items:center;flex-shrink:0}
+    .crit-head h2{margin:0;font-family:var(--display);font-weight:900;font-size:15px;letter-spacing:.01em;text-transform:uppercase;color:var(--coral-ink)}
+    .crit-item{display:flex;gap:10px;padding:9px 0}
+    .crit-item+.crit-item{border-top:1px solid rgba(228,71,42,.14)}
+    .crit-item svg{flex-shrink:0;color:var(--coral);margin-top:2px}
+    .crit-item b{display:block;font-size:15px;font-weight:800;color:var(--ink)}
+    .crit-item span.note{display:block;font-size:12.5px;font-weight:600;color:var(--coral-ink);margin-top:2px}
+
+    /* call stack */
+    .call-stack{display:flex;flex-direction:column;gap:10px}
+    .call-btn{display:flex;align-items:center;gap:12px;border-radius:20px;padding:13px 14px;box-shadow:var(--shadow);transition:transform .15s}
+    .call-btn:active{transform:scale(.97)}
+    .call-ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex-shrink:0}
+    .call-ic svg path{fill:currentColor}
+    .call-name{flex:1;min-width:0;font-weight:900;font-size:15.5px;line-height:1.25}
+
+    .call-btn.amb{background:linear-gradient(135deg,#1b2435,var(--ink3));color:#fff;animation:soft-glow 2.6s infinite}
+    .call-btn.amb .call-ic{background:var(--coral);color:#fff}
+
+    .call-btn.primary{background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:#fff}
+    .call-btn.primary .call-ic{background:rgba(255,255,255,.22);color:#fff}
+
+    .call-btn.secondary{background:var(--surface);border:2px solid var(--rule);color:var(--ink)}
+    .call-btn.secondary .call-ic{background:var(--blue-soft);color:var(--blue-ink)}
+
+    /* steps (first-steps, always visible, not collapsible) */
+    .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+    .steps li{display:flex;gap:11px}
+    .steps .k{width:26px;height:26px;border-radius:50%;background:var(--teal-soft);color:var(--teal-deep);font:800 12px var(--mono);display:grid;place-items:center;flex-shrink:0}
+    .steps-title{display:flex;align-items:center;gap:9px;margin:0 0 12px}
+    .steps-title .xic{width:38px;height:38px;border-radius:11px;background:var(--teal-soft);color:var(--teal-deep);display:grid;place-items:center;flex-shrink:0}
+    .steps-title h2{margin:0;font-size:15.5px;font-weight:800;color:var(--ink)}
+
+    /* collapsible */
+    details.xcard{border-radius:20px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--card-border);background:var(--surface)}
+    details.xcard summary{list-style:none;cursor:pointer;width:100%;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;padding:14px;text-align:left}
+    details.xcard summary::-webkit-details-marker{display:none}
+    .xic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0}
+    .xt{font-size:14.5px;font-weight:800;color:var(--ink)}
+    .count-pill{font:800 11px var(--mono);padding:3px 8px;border-radius:7px;flex-shrink:0}
+    .chev{width:22px;height:22px;flex-shrink:0;transition:transform .3s cubic-bezier(.2,.75,.2,1);color:var(--ink-2)}
+    details.xcard[open] .chev{transform:rotate(180deg)}
+    .xbody-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.2,.75,.2,1)}
+    details.xcard[open] .xbody-wrap{grid-template-rows:1fr}
+    .xbody-inner{overflow:hidden}
+    .xbody{padding:0 14px 14px;border-top:1px solid var(--rule)}
+
+    details.xcard.c-amber .xic{background:var(--amber-soft);color:var(--amber-ink)}
+    details.xcard.c-amber .count-pill{background:var(--amber-soft);color:var(--amber-ink)}
+    details.xcard.c-blue .xic{background:var(--blue-soft);color:var(--blue-ink)}
+    details.xcard.c-blue .count-pill{background:var(--blue-soft);color:var(--blue-ink)}
+    details.xcard.c-violet .xic{background:var(--violet-soft);color:var(--violet-ink)}
+    details.xcard.c-violet .count-pill{background:var(--violet-soft);color:var(--violet-ink)}
+    details.xcard.c-teal .xic{background:var(--teal-soft);color:var(--teal-deep)}
+
+    .row-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0}
+    .row-item+.row-item{border-top:1px solid var(--rule)}
+    .row-item b{font-size:14px;font-weight:800;color:var(--ink);display:block}
+    .row-item .note{font-size:12px;color:var(--ink-2);font-weight:600;margin-top:1px;display:block}
+    .pill{font:800 11px var(--body);padding:4px 9px;border-radius:7px;flex-shrink:0;white-space:nowrap}
+    .pill.danger{background:var(--coral-soft);color:var(--coral-ink)}
+
+    /* facts / quiet data grid */
+    .quiet-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-top:12px}
+    .quiet-grid .full{grid-column:1/-1}
+    .qbox{background:var(--page);border:1px solid var(--rule);border-radius:13px;padding:10px 11px}
+    .qbox .ql{font:800 10px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);display:block}
+    .qbox .qv{font-weight:800;font-size:15px;color:var(--ink);display:block;margin-top:3px}
+
+    /* freshness + share */
+    .fresh{display:flex;align-items:center;gap:8px;background:var(--teal-soft);border-radius:16px;padding:11px 13px;box-shadow:var(--shadow);border:1px solid var(--card-border);font:700 12px var(--body);color:var(--teal-deep)}
+    .fresh.old{background:var(--amber-soft);color:var(--amber-ink)}
+    .fresh svg{flex-shrink:0}
+
+    .share{width:100%;background:var(--surface);border:2px solid var(--ink3);border-radius:18px;padding:13px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:800;font-size:14px;color:var(--ink);box-shadow:var(--shadow);transition:transform .15s}
+    .share:active{transform:scale(.98)}
+    .share[hidden]{display:none}
+    .share-note{text-align:center;background:var(--page);padding:9px;border-radius:12px;border:1px solid var(--rule)}
+
+    /* message (error/not-found) page */
+    .message-card{text-align:center;padding:30px 18px}
+    .message-card .ic{width:52px;height:52px;border-radius:16px;background:var(--amber-soft);color:var(--amber-ink);display:grid;place-items:center;margin:0 auto 14px}
+    .message{font-family:var(--display);font-weight:800;font-size:19px;margin:0 0 6px;color:var(--ink)}
+    .message-sub{color:var(--ink-2);margin:0;font-weight:600;font-size:14px}
+
+    footer{text-align:center;padding-top:6px}
+    footer p{font-size:11px;line-height:1.5;color:var(--ink-2);max-width:340px;margin:0 auto}
+
+    [hidden]{display:none !important}
+
+    /* Dark mode: flatten the full-card color washes to a neutral surface and carry
+       color identity with a strong border/accent-stripe instead, so cards don't turn
+       into a muddy, mismatched patchwork once the page itself goes dark — and give the
+       outline-style secondary call button a visible fill so it doesn't disappear. */
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]) .id-card{background:var(--surface);border-left:4px solid var(--teal)}
+      :root:not([data-theme="light"]) .advisory{background:var(--surface);border:2px solid var(--amber)}
+      :root:not([data-theme="light"]) .crit-card{background:var(--surface)}
+      :root:not([data-theme="light"]) .fresh{background:var(--surface);border-left:4px solid var(--teal)}
+      :root:not([data-theme="light"]) .fresh.old{background:var(--surface);border-left:4px solid var(--amber)}
+      :root:not([data-theme="light"]) .call-btn.secondary{background:#1b2130;border-color:#39435a}
+      :root:not([data-theme="light"]) .call-btn.secondary .call-ic{background:#2a3449;color:var(--blue-ink)}
     }
   </style>
 </head>
 
 <body>
-  <main>
+  <main class="wrap stack">
 
-    <div class="statusbar rise">
+    <div class="topbar rise">
       <span class="idbadge">
-        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="#fff" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z" />
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>
         {{ t('badge') }}
       </span>
       <nav class="langrow" aria-label="Language">
-        {% for l in lang_links %}<a href="{{ l.url }}" lang="{{ l.code }}"
-          aria-current="{{ 'true' if l.current else 'false' }}">{{ l.label }}</a>{% endfor %}
+        {% for l in lang_links %}<a href="{{ l.url }}" lang="{{ l.code }}" aria-current="{{ 'true' if l.current else 'false' }}">{{ l.label }}</a>{% endfor %}
       </nav>
     </div>
-
-    <div class="topbar rise">
-      <h1>{{ t('title') }}</h1>
-    </div>
+    <h1 class="page-title rise">{{ t('title') }}</h1>
 
     {% if status != 'ok' %}
 
     <section class="card message-card rise">
+      <span class="ic">
+        <svg width="26" height="26" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+      </span>
       <p class="message">{{ message }}</p>
       <p class="message-sub">{{ t('need_help') }}</p>
     </section>
     <div class="call-stack rise">
-      <a class="call-sos" href="tel:1990">{{ phone_icon|safe }}{{ t('call_1990') }}</a>
+      <a class="call-btn amb touch" href="tel:1990">
+        <span class="call-ic">{{ phone_icon|safe }}</span>
+        <span class="call-name">{{ t('call_1990') }}</span>
+      </a>
     </div>
 
     {% else %}
 
     <section class="card id-card rise">
       {% if photo_url %}<img src="{{ photo_url }}" alt="{{ person.name }}">{% endif %}
-      <div>
+      <div class="id-info">
         <p class="id-name">{{ person.name }}</p>
-        {% if person.age is not none %}<p class="id-age">{{ t('age', n=person.age) }}</p>{% endif %}
+        {% if person.age is not none %}<span class="id-age">{{ t('age', n=person.age) }}</span>{% endif %}
       </div>
     </section>
 
-    <div class="btn-row rise">
-      <button class="btn-listen" id="listen" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z" />
-        </svg>
-        {{ t('listen') }}
+    <section class="rise">
+      <button class="listen-btn" id="listen" type="button">
+        <span class="listen-ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+        </span>
+        <span class="listen-text">{{ t('listen') }}</span>
       </button>
-    </div>
-    <p class="status-note" id="listen-note" hidden>{{ t('listen_unavailable') }}</p>
+      <p class="status-note" id="listen-note" hidden>{{ t('listen_unavailable') }}</p>
+    </section>
 
     {% if lost %}
-    <section class="card banner rise" role="alert">
-      <strong>{{ t('lost_banner') }}</strong>
-      {% if lost.home_area %}<span>{{ t('home_area', area=lost.home_area) }}</span>{% endif %}
+    <section class="advisory rise" role="alert">
+      <span class="ic">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+      </span>
+      <div>
+        <p>{{ t('lost_banner') }}</p>
+        {% if lost.home_area %}<p class="sub">{{ t('home_area', area=lost.home_area) }}</p>{% endif %}
+      </div>
     </section>
     {% endif %}
 
     {% if alerts %}
     <section class="card crit-card rise" aria-labelledby="alerts-h">
-      <h2 id="alerts-h">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z" />
-        </svg>
-        {{ t('alerts') }}
-      </h2>
+      <div class="crit-head">
+        <span class="crit-ic">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 9a1 1 0 012 0v4a1 1 0 11-2 0V9zm1-4a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/></svg>
+        </span>
+        <h2 id="alerts-h">{{ t('alerts') }}</h2>
+      </div>
       {% for a in alerts %}
       <div class="crit-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z" />
-        </svg>
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
         <div><b>{{ a.label }}</b>{% if a.note %}<span class="note">{{ a.note }}</span>{% endif %}</div>
       </div>
       {% endfor %}
@@ -591,100 +279,120 @@
     {% endif %}
 
     <div class="call-stack rise">
-      {% for c in contacts %}<a class="call-contact" href="tel:{{ c.phone }}">{{ phone_icon|safe }}{{ c.label }}</a>{%
-      endfor %}
-      <a class="call-sos" href="tel:1990">{{ phone_icon|safe }}{{ t('call_1990') }}</a>
+      <a class="call-btn amb touch" href="tel:1990">
+        <span class="call-ic">{{ phone_icon|safe }}</span>
+        <span class="call-name">{{ t('call_1990') }}</span>
+      </a>
+      {% for c in contacts %}
+      <a class="call-btn {{ 'primary' if loop.first else 'secondary' }} touch" href="tel:{{ c.phone }}">
+        <span class="call-ic">{{ phone_icon|safe }}</span>
+        <span class="call-name">{{ c.label }}</span>
+      </a>
+      {% endfor %}
     </div>
 
-    <section class="card steps rise">
-      <h2 style="font-size:17px;margin-bottom:8px">{{ t('first_steps') }}</h2>
-      <ol>
-        <li>{{ t('step_1') }}</li>
-        <li>{{ t('step_2') }}</li>
-        <li>{{ t('step_3') }}</li>
+    <section class="card rise">
+      <div class="steps-title">
+        <span class="xic">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        </span>
+        <h2>{{ t('first_steps') }}</h2>
+      </div>
+      <ol class="steps">
+        <li><span class="k">1</span><span>{{ t('step_1') }}</span></li>
+        <li><span class="k">2</span><span>{{ t('step_2') }}</span></li>
+        <li><span class="k">3</span><span>{{ t('step_3') }}</span></li>
       </ol>
     </section>
 
     {% if allergies %}
-    <details class="xcard rise" open>
+    <details class="xcard c-amber rise" open>
       <summary>
-        <span>{{ t('allergies') }}<span class="count-pill">{{ allergies|length }}</span></span>
-        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M7 10l5 5 5-5z" />
-        </svg>
+        <span class="xic">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        </span>
+        <span class="xt">{{ t('allergies') }}</span>
+        <span class="count-pill">{{ allergies|length }}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
       </summary>
-      <div class="xbody">
+      <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody">
         {% for al in allergies %}
         <div class="row-item">
           <div><b>{{ al.substance }}</b>{% if al.reaction %}<span class="note">{{ al.reaction }}</span>{% endif %}</div>
           {% if al.severity %}<span class="pill danger">{{ al.severity }}</span>{% endif %}
         </div>
         {% endfor %}
-      </div>
+      </div></div></div>
     </details>
     {% endif %}
 
     {% if conditions %}
-    <details class="xcard rise">
+    <details class="xcard c-blue rise" open>
       <summary>
-        <span>{{ t('conditions') }}<span class="count-pill">{{ conditions|length }}</span></span>
-        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M7 10l5 5 5-5z" />
-        </svg>
+        <span class="xic">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 00-1 1v6H2a1 1 0 00-1 1v2a1 1 0 001 1h6v6a1 1 0 001 1h2a1 1 0 001-1v-6h6a1 1 0 001-1v-2a1 1 0 00-1-1h-6V3a1 1 0 00-1-1H9z"/></svg>
+        </span>
+        <span class="xt">{{ t('conditions') }}</span>
+        <span class="count-pill">{{ conditions|length }}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
       </summary>
-      <div class="xbody">
-        {% for c in conditions %}<div class="row-item">
-          <div><b>{{ c }}</b></div>
-        </div>{% endfor %}
-      </div>
+      <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody">
+        {% for c in conditions %}<div class="row-item"><div><b>{{ c }}</b></div></div>{% endfor %}
+      </div></div></div>
     </details>
     {% endif %}
 
     {% if medicines %}
-    <details class="xcard rise">
+    <details class="xcard c-violet rise" open>
       <summary>
-        <span>{{ t('medicines') }}<span class="count-pill">{{ medicines|length }}</span></span>
-        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M7 10l5 5 5-5z" />
-        </svg>
+        <span class="xic">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm2 4h8v2H6V6zm0 4h8v2H6v-2z"/></svg>
+        </span>
+        <span class="xt">{{ t('medicines') }}</span>
+        <span class="count-pill">{{ medicines|length }}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
       </summary>
-      <div class="xbody">
-        {% for m in medicines %}<div class="row-item">
-          <div><b>{{ m }}</b></div>
-        </div>{% endfor %}
-      </div>
+      <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody">
+        {% for m in medicines %}<div class="row-item"><div><b>{{ m }}</b></div></div>{% endfor %}
+      </div></div></div>
     </details>
     {% endif %}
 
     {% if facts %}
-    <details class="xcard facts rise">
+    <details class="xcard c-teal rise" open>
       <summary>
-        <span>More details</span>
-        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M7 10l5 5 5-5z" />
-        </svg>
+        <span class="xic">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+        </span>
+        <span class="xt">More details</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
       </summary>
-      <div class="xbody">
-        <dl>
-          {% for f in facts %}<dt>{{ f.label }}</dt>{% if f.value %}<dd>{{ f.value }}</dd>{% endif %}{% endfor %}
-        </dl>
-      </div>
+      <div class="xbody-wrap"><div class="xbody-inner"><div class="xbody">
+        <div class="quiet-grid">
+          {% for f in facts %}
+          <div class="qbox{{ ' full' if f.value and f.value|length > 18 else '' }}">
+            {% if f.value %}<span class="ql">{{ f.label }}</span><span class="qv">{{ f.value }}</span>
+            {% else %}<span class="qv">{{ f.label }}</span>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div></div></div>
     </details>
     {% endif %}
 
-    <section class="card rise">
-      <p class="fresh {{ 'old' if updated.old else 'ok' }}">
-        {% if updated.old %}<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z" />
-        </svg>
-        {% else %}<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
-        </svg>{% endif %}
-        {{ updated.text }}
-      </p>
-      <button class="share" id="share" type="button">{{ t('share_location') }}</button>
-      <p class="status-note" id="share-sent" hidden>{{ t('location_sent') }}</p>
-      <p class="status-note" id="share-failed" hidden>{{ t('location_failed') }}</p>
+    <section class="fresh rise {{ 'old' if updated.old else '' }}">
+      {% if updated.old %}<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+      {% else %}<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>{% endif %}
+      {{ updated.text }}
+    </section>
+
+    <section class="rise">
+      <button class="share touch" id="share" type="button">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        {{ t('share_location') }}
+      </button>
+      <p class="status-note share-note" id="share-sent" hidden>{{ t('location_sent') }}</p>
+      <p class="status-note share-note" id="share-failed" hidden>{{ t('location_failed') }}</p>
     </section>
 
     <script type="application/json" id="page-data">{{ page_data|tojson }}</script>
